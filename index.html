@@ -276,9 +276,16 @@
     background: var(--bg-plank);
     border: 1px solid var(--border-gold);
     border-radius: 4px;
-    padding: 24px;
+    padding: 24px 20px;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    min-height: 120px;
   }
   .info-box::before {
     content: '';
@@ -289,20 +296,22 @@
   }
   .info-box h4 {
     font-family: 'Cinzel', serif;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--gold-dim);
-    margin-bottom: 10px;
+    margin: 0;
+    white-space: nowrap;
   }
-  .info-box p { font-size: 15px; color: var(--parchment-dim); margin: 0; }
-  .info-box strong { color: var(--gold-light); display: block; font-size: 18px; margin-top: 4px; font-style: normal; }
+  .info-box p { font-size: 14px; color: var(--parchment-dim); margin: 0; line-height: 1.4; }
+  .info-box strong { color: var(--gold-light); display: block; font-size: 16px; font-style: normal; margin: 0; line-height: 1.3; }
 
   .info-boxes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-top: 0;
+    align-items: stretch;
   }
   @media (max-width: 480px) { .info-boxes-grid { grid-template-columns: 1fr; } }
 
@@ -356,7 +365,7 @@
     background: var(--bg-dark);
     border: 1px solid var(--border-gold);
     border-radius: 4px;
-    padding: 28px;
+    padding: 20px 20px 20px;
     text-align: center;
     margin-top: 40px;
     position: relative;
@@ -376,28 +385,71 @@
     text-transform: uppercase;
     margin-bottom: 20px;
   }
-  .calendar-placeholder-inner {
-    background: rgba(0,0,0,0.3);
-    border: 1px dashed rgba(232,168,32,0.2);
+  #calendar-widget { display: flex; flex-direction: column; gap: 8px; }
+  .cal-event {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--bg-plank);
+    border: 1px solid var(--border-gold);
+    border-left: 3px solid var(--gold-dim);
     border-radius: 4px;
-    min-height: 380px;
+    padding: 14px 20px;
+    transition: border-color 0.2s, border-left-color 0.2s;
+  }
+  .cal-event:hover { border-color: var(--gold); border-left-color: var(--gold); }
+  .cal-date-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    color: var(--text-muted);
-    font-size: 14px;
-    font-style: italic;
+    min-width: 52px;
+    background: rgba(232,168,32,0.08);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 8px 10px;
+    line-height: 1;
+    flex-shrink: 0;
   }
-  .calendar-placeholder-inner .dice-icon { font-size: 40px; opacity: 0.4; }
-  .calendar-placeholder-inner code {
-    font-size: 12px;
-    background: rgba(0,0,0,0.4);
-    padding: 6px 12px;
-    border-radius: 3px;
-    color: var(--parchment-dim);
-    font-style: normal;
+  .cal-dow {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--ember-glow);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .cal-day {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .cal-mon {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .cal-info { flex: 1; min-width: 0; }
+  .cal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    color: var(--parchment);
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cal-meta { font-size: 13px; color: var(--text-muted); }
+  .cal-empty, .cal-loading {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 40px 20px;
   }
 
   /* === GAMES SECTION === */
@@ -603,7 +655,7 @@
 
     <div class="about-grid">
       <div class="parchment-card">
-        <h3>Kto jesteśmy?</h3>
+        <h3>Kim jesteśmy?</h3>
         <p>Fantasfera to trójmiejska grupa pasjonatów nowoczesnych gier planszowych. Spotykamy się regularnie, by wspólnie odkrywać nowe tytuły, toczyć epickie bitwy i spędzać czas w świetnej atmosferze — zupełnie jak w starej, dobrej tawernie.</p>
         <p>Gramy we wszystko: od lekkich gier rodzinnych, przez karcianki i gry strategiczne, aż po ciężkie gry euro i RPG. Najważniejsza jest dla nas dobra zabawa i przyjazna atmosfera — bez względu na poziom zaawansowania.</p>
 
@@ -698,15 +750,8 @@
 
     <div class="calendar-embed-box">
       <h3>📅 Najbliższe wydarzenia</h3>
-      <!--
-        === INSTRUKCJA AFTERGAME EMBED ===
-        Wklej tutaj kod iframe z Aftergame, zastępując cały blok .calendar-placeholder-inner.
-        Przykład:
-        <iframe src="https://aftergame.app/groups/fantasfera/embed" width="100%" height="500" frameborder="0"></iframe>
-      -->
-      <div class="calendar-placeholder-inner">
-        <div class="dice-icon">🎲</div>
-        <p>Tutaj wkrótcepojawi się kalendarz </p>
+      <div id="calendar-widget">
+        <p class="cal-loading">Ładowanie wydarzeń…</p>
       </div>
     </div>
   </div>
@@ -803,5 +848,104 @@
   <p class="footer-copy">&copy; 2026 Fantasfera &nbsp;·&nbsp; Wszelkie prawa do rzutów kostką zastrzeżone &nbsp;🎲</p>
 </footer>
 
+<script>
+(function () {
+  var MONTHS     = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+  var MONTHS_SHORT = ['STY','LUT','MAR','KWI','MAJ','CZE','LIP','SIE','WRZ','PAŹ','LIS','GRU'];
+  var DAYS       = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+  var DAYS_SHORT = ['NDZ','PN','WT','ŚR','CZW','PT','SOB'];
+
+  function unescapeIcal(s) {
+    return s.replace(/\\n/g, ' ').replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\\\/g, '\\');
+  }
+
+  function parseDate(prop, val) {
+    var v = val.trim();
+    try {
+      if (v.length === 8) return new Date(+v.substr(0,4), +v.substr(4,2)-1, +v.substr(6,2));
+      var y=+v.substr(0,4), mo=+v.substr(4,2)-1, d=+v.substr(6,2);
+      var h=+v.substr(9,2), mi=+v.substr(11,2), s=+v.substr(13,2);
+      return v.endsWith('Z') ? new Date(Date.UTC(y,mo,d,h,mi,s)) : new Date(y,mo,d,h,mi,s);
+    } catch(e) { return null; }
+  }
+
+  function parseIcal(text) {
+    var norm = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n[ \t]/g,'');
+    var lines = norm.split('\n');
+    var events = [], evt = null;
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      if (line === 'BEGIN:VEVENT') { evt = {}; continue; }
+      if (line === 'END:VEVENT')   { if (evt) events.push(evt); evt = null; continue; }
+      if (!evt) continue;
+      var ci = line.indexOf(':');
+      if (ci < 0) continue;
+      var prop = line.substring(0, ci), val = line.substring(ci + 1);
+      var name = prop.split(';')[0].toUpperCase();
+      if      (name === 'SUMMARY')     evt.title    = unescapeIcal(val);
+      else if (name === 'LOCATION')    evt.location = unescapeIcal(val);
+      else if (name === 'DTSTART')     evt.start    = parseDate(prop, val);
+      else if (name === 'DTEND')       evt.end      = parseDate(prop, val);
+    }
+    return events;
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderEvent(evt) {
+    var d = evt.start;
+    var allDay = (d.getHours() === 0 && d.getMinutes() === 0);
+    var time = allDay ? '' : ', godz. ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    var fullDate = DAYS[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + time;
+    var location = evt.location ? '<br>📍 ' + esc(evt.location) : '';
+    return '<div class="cal-event">' +
+      '<div class="cal-date-box"><span class="cal-dow">' + DAYS_SHORT[d.getDay()] + '</span><span class="cal-day">' + d.getDate() + '</span><span class="cal-mon">' + MONTHS_SHORT[d.getMonth()] + '</span></div>' +
+      '<div class="cal-info"><div class="cal-title">' + esc(evt.title || '(bez tytułu)') + '</div><div class="cal-meta">' + fullDate + location + '</div></div>' +
+      '</div>';
+  }
+
+  var ICAL_URL = 'https://calendar.google.com/calendar/ical/2da0751953a6122c8f81e7f4840092cac413ef4c5a4070ff395bcf0c3c450b2e%40group.calendar.google.com/public/basic.ics';
+  var PROXIES = [
+    'https://corsproxy.io/?' + ICAL_URL,
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(ICAL_URL),
+  ];
+
+  var widget = document.getElementById('calendar-widget');
+
+  function tryFetch(proxies) {
+    if (!proxies.length) return Promise.reject(new Error('all proxies failed'));
+    return fetch(proxies[0])
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (!text || text.indexOf('BEGIN:VCALENDAR') < 0) throw new Error('invalid');
+        return text;
+      })
+      .catch(function() { return tryFetch(proxies.slice(1)); });
+  }
+
+  tryFetch(PROXIES)
+    .then(function(text) {
+      var now = new Date(); now.setHours(0,0,0,0);
+      var all = parseIcal(text);
+      var events = all
+        .filter(function(e) { return e.start && e.start >= now; })
+        .sort(function(a,b) { return a.start - b.start; })
+        .slice(0, 12);
+      if (events.length) {
+        widget.innerHTML = events.map(renderEvent).join('');
+      } else if (all.length > 0) {
+        widget.innerHTML = '<p class="cal-empty">Brak nadchodzących wydarzeń — sprawdź wkrótce!</p>';
+      } else {
+        widget.innerHTML = '<p class="cal-empty">Kalendarz jest pusty.</p>';
+      }
+    })
+    .catch(function() {
+      widget.innerHTML = '<p class="cal-empty">Nie udało się załadować kalendarza. Spróbuj odświeżyć stronę.</p>';
+    });
+})();
+</script>
 </body>
 </html>

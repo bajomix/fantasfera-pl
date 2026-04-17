@@ -1,5 +1,27 @@
 # Changelog
 
+## [2026-04-17] — Widget kalendarza Google + poprawki UI
+
+### Nowe funkcje
+- Zastąpiono iframe Google Calendar własnym widgetem JavaScript:
+  - Pobiera wydarzenia z publicznego kalendarza przez iCal (`.ics`)
+  - Wyświetla nadchodzące wydarzenia posortowane chronologicznie (max 12)
+  - Każde wydarzenie: boksik z datą (skrót dnia tygodnia, numer dnia, skrót miesiąca) + tytuł + pełna data + godzina + lokalizacja
+  - Fallback na dwa CORS proxy (`corsproxy.io`, `allorigins.win`) — działa bez PHP
+  - Styl pasuje do kolorystyki strony (ciemne tło, złote akcenty, Cinzel)
+- Dodano `ical-proxy.php` (PHP proxy — nieaktywny, InfinityFree blokuje outbound HTTP)
+
+### Poprawki UI
+- Sekcja "Kto jesteśmy?" → "Kim jesteśmy?"
+- Karty informacyjne (Gdzie / Rodzaj gier / Nowi gracze / Spotkania):
+  - Treść wyśrodkowana poziomo i pionowo (flexbox)
+  - Jednakowa wysokość kart (`min-height: 120px`)
+  - Równomierne odstępy między elementami (`gap`)
+  - Skrócone etykiety nie łamią się (`white-space: nowrap`)
+- Widget kalendarza: pełna nazwa miesiąca i dnia tygodnia w metadanych wydarzenia, skrót dnia tygodnia w boksiku daty
+
+---
+
 ## [2026-04-17] — Synchronizacja z InfinityFree
 
 ### Zmiany
