@@ -1,5 +1,24 @@
 # Changelog
 
+## [2026-04-17] — Favicon + wyśrodkowanie wtyczki Facebook
+
+### Zmiany
+- Dodano favicon (`dice_favicon.png` — ikona kości RPG) wyświetlany w zakładce przeglądarki
+- Wyśrodkowano wtyczkę Facebook Page Plugin w kontenerze (flexbox `justify-content: center`)
+- Usunięto nadmiarowe `width: 100% !important` na elementach `.fb-page`, które blokowały wyśrodkowanie
+
+---
+
+## [2026-04-17] — Responsywna szerokość wtyczki Facebook Page Plugin
+
+### Poprawki
+- Wtyczka Facebook nie rozciągała się do pełnej szerokości kontenera — wyświetlała się wąsko po lewej stronie
+- Usunięto `xfbml=1` z URL SDK (zapobieganie przedwczesnemu renderowaniu przed ustawieniem szerokości)
+- Dodano `window.fbAsyncInit` z ręcznym wywołaniem `FB.XFBML.parse()` po ustawieniu `data-width` na rzeczywistą szerokość kontenera (px)
+- Dodano handler `resize` z debouncingiem (300ms) — wtyczka ponownie renderuje się po zmianie rozmiaru okna
+
+---
+
 ## [2026-04-17] — Przeniesienie wtyczki Facebook pod widget Aftergame
 
 ### Zmiany

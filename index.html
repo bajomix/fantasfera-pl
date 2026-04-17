@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fantasfera – Grupa Planszówkowa Trójmiasto</title>
+<link rel="icon" type="image/png" href="dice_favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -564,11 +565,8 @@
   }
   .fb-embed-inner {
     width: 100%;
-  }
-  .fb-embed-inner > .fb-page,
-  .fb-embed-inner > .fb-page span,
-  .fb-embed-inner > .fb-page span iframe {
-    width: 100% !important;
+    display: flex;
+    justify-content: center;
   }
 
   .social-grid {
@@ -671,6 +669,20 @@
 </head>
 <body>
 <div id="fb-root"></div>
+<script>
+  var _fbResizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(_fbResizeTimer);
+    _fbResizeTimer = setTimeout(function() {
+      var fbPage = document.querySelector('.fb-page');
+      var container = document.querySelector('.fb-embed-inner');
+      if (fbPage && container) {
+        fbPage.setAttribute('data-width', Math.floor(container.offsetWidth));
+      }
+      if (window.FB) FB.XFBML.parse();
+    }, 300);
+  });
+</script>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v25.0&appId=1696226088381172"></script>
 
 <!-- NAV -->
@@ -831,6 +843,14 @@
           data-hide-cover="false"
           data-show-facepile="true">
         </div>
+        <script>
+          (function() {
+            var el = document.currentScript.previousElementSibling;
+            var container = el.parentElement;
+            var w = container.offsetWidth;
+            if (w > 0) el.setAttribute('data-width', w);
+          })();
+        </script>
       </div>
     </div>
   </div>
