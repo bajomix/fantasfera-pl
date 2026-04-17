@@ -1,5 +1,20 @@
 # Changelog
 
+## [2026-04-17] — Facebook Page Plugin + poprawki logo w nawigacji
+
+### Nowe funkcje
+- Dodano Facebook Page Plugin w sekcji "Znajdź nas w sieci":
+  - Boks `.fb-embed-box` poniżej kart social media, styl zgodny ze stroną (ciemne tło, złoty nagłówek, niebieska kreska akcentująca)
+  - SDK Facebook: `sdk.js#xfbml=1&version=v25.0&appId=1696226208381172`, język pl_PL
+  - Plugin wyświetla timeline strony facebook.com/fantasfera, dopasowuje szerokość do kontenera
+
+### Poprawki
+- Logo nawigacji (`Napis_transparent.png`): usunięto hardcodowane atrybuty `width`/`height`, zastąpione przez CSS (`height: 48px; width: auto`) — brak ucinania
+- Wysokość navbara zwiększona z 60px do 72px
+- To samo w stopce
+
+---
+
 ## [2026-04-17] — Widget Aftergame w sekcji harmonogramu
 
 ### Nowe funkcje

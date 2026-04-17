@@ -97,7 +97,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 60px;
+    height: 72px;
   }
   .nav-brand {
     font-family: 'Cinzel Decorative', serif;
@@ -105,6 +105,13 @@
     color: var(--gold);
     text-decoration: none;
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+  }
+  .nav-logo {
+    height: 48px;
+    width: auto;
+    display: block;
   }
   .nav-links { display: flex; gap: 32px; list-style: none; }
   .nav-links a {
@@ -530,6 +537,36 @@
   /* === SOCIAL SECTION === */
   #dolacz { background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-dark) 100%); }
 
+  .fb-embed-box {
+    margin-top: 40px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 24px 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .fb-embed-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #1877f2, transparent);
+  }
+  .fb-embed-box h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .fb-embed-inner {
+    display: flex;
+    justify-content: center;
+  }
+
   .social-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -629,11 +666,13 @@
 </style>
 </head>
 <body>
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v25.0&appId=1696226088381172"></script>
 
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="nav-brand"><img src="Napis_transparent.png" width="180" height="53.93" alt="Fantasfera"></a>
+    <a href="#" class="nav-brand"><img src="Napis_transparent.png" alt="Fantasfera" class="nav-logo"></a>
     <ul class="nav-links">
       <li><a href="#o-nas">O nas</a></li>
       <li><a href="#harmonogram">Spotkania</a></li>
@@ -857,12 +896,28 @@
         <div class="social-arrow">Dołącz →</div>
       </a>
     </div>
+
+    <div class="fb-embed-box">
+      <h3>📘 Nasza strona na Facebooku</h3>
+      <div class="fb-embed-inner">
+        <div class="fb-page"
+          data-href="https://www.facebook.com/fantasfera"
+          data-tabs="timeline"
+          data-width=""
+          data-height=""
+          data-small-header="false"
+          data-adapt-container-width="true"
+          data-hide-cover="false"
+          data-show-facepile="true">
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-brand"><img src="Napis_transparent.png" width="180" height="53.93" alt="Fantasfera"></div>
+  <div class="footer-brand"><img src="Napis_transparent.png" alt="Fantasfera" style="height:48px;width:auto;"></div>
   <p class="footer-sub">Trójmiejska Grupa Planszówkowa · Gdańsk · Gdynia · Sopot</p>
   <div class="footer-divider"></div>
   <p class="footer-copy">&copy; 2026 Fantasfera &nbsp;·&nbsp; Wszelkie prawa do rzutów kostką zastrzeżone &nbsp;🎲</p>
