@@ -16,7 +16,7 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 |---|---|
 | **Hero** | Logo, hasło, wstęp |
 | **O nas** | Opis grupy, karty informacyjne (Gdzie / Rodzaj gier / Nowi gracze / Spotkania) |
-| **Harmonogram** | Tabela cyklicznych spotkań + widget kalendarza Google |
+| **Harmonogram** | Tabela cyklicznych spotkań + widget kalendarza Google + widget Aftergame |
 | **Biblioteka Gier** | Placeholder na embed BoardGameGeek |
 | **Znajdź nas w sieci** | Linki do Aftergame, Facebooka, Instagrama, Discorda |
 

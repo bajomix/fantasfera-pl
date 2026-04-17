@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-04-17] — Widget Aftergame w sekcji harmonogramu
+
+### Nowe funkcje
+- Dodano widget Aftergame jako osobny boks poniżej kalendarza Google w sekcji Harmonogram
+  - Tytuł: "Odkryj nasze wydarzenia w Aftergame"
+  - iframe: `https://aftergame.app/groups/fantasfera/events?mode=embed`, wysokość 400px
+  - Styl zgodny z resztą strony (`.calendar-embed-box`, pomarańczowa kreska, Cinzel)
+  - Zredukowany padding i margin-top dla zwartego wyglądu
+
+---
+
 ## [2026-04-17] — Poprawki tabeli harmonogramu
 
 ### Zmiany UI
