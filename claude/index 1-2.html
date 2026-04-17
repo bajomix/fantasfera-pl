@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fantasfera – Grupa Planszówkowa Trójmiasto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:      #1a0c04;
+    --bg-dark:      #2a1208;
+    --bg-plank:     #3d1f0a;
+    --bg-warm:      #5a2e10;
+    --gold:         #e8a820;
+    --gold-light:   #f5c842;
+    --gold-dim:     #b07d14;
+    --parchment:    #f2e0b8;
+    --parchment-dim:#c8b07a;
+    --ember:        #c94c0c;
+    --ember-glow:   #e8631a;
+    --text-main:    #f0d89a;
+    --text-muted:   #a88a50;
+    --plank-line:   rgba(0,0,0,0.35);
+    --border-gold:  rgba(232,168,32,0.4);
+    --border-warm:  rgba(90,46,16,0.8);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* === WOOD PLANK TEXTURE === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        180deg,
+        transparent 0px,
+        transparent 38px,
+        var(--plank-line) 38px,
+        var(--plank-line) 40px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 120px,
+        rgba(0,0,0,0.06) 120px,
+        rgba(0,0,0,0.06) 122px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === LAYOUT === */
+  .page-wrap { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+  /* === IRON DIVIDER === */
+  .iron-divider {
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--bg-deep), #4a4a4a 20%, #888 50%, #4a4a4a 80%, var(--bg-deep));
+    margin: 0;
+    position: relative;
+  }
+  .iron-divider::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin-top: 2px;
+  }
+
+  /* === NAV === */
+  nav {
+    background: var(--bg-dark);
+    border-bottom: 2px solid var(--border-gold);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--parchment-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; }
+    .nav-links a { font-size: 11px; }
+    .nav-brand { font-size: 14px; }
+  }
+
+  /* === HERO === */
+  .hero {
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px 60px;
+    background:
+      linear-gradient(to bottom, rgba(26,12,4,0.0) 0%, rgba(26,12,4,0.85) 100%),
+      radial-gradient(ellipse at 50% 60%, rgba(201,76,12,0.18) 0%, transparent 70%);
+    position: relative;
+  }
+
+  .hero-logo-wrap {
+    margin-bottom: 32px;
+    animation: fadeDown 0.9s ease both;
+  }
+  .hero-logo {
+    width: 240px;
+    height: auto;
+    filter: drop-shadow(0 4px 24px rgba(232,168,32,0.5));
+  }
+  .hero-logo-fallback {
+    display: inline-block;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 52px;
+    color: var(--gold);
+    text-shadow: 0 2px 12px rgba(232,168,32,0.5), 0 0 40px rgba(201,76,12,0.3);
+    letter-spacing: 4px;
+  }
+
+  .hero-tagline {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(13px, 2vw, 16px);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--parchment-dim);
+    margin-bottom: 12px;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(30px, 5vw, 52px);
+    color: var(--gold-light);
+    text-shadow: 2px 2px 0 #3d1f0a, 0 0 30px rgba(232,168,32,0.4);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    animation: fadeUp 0.9s 0.3s ease both;
+  }
+  .hero-subtitle {
+    font-size: 17px;
+    font-style: italic;
+    color: var(--parchment-dim);
+    max-width: 520px;
+    animation: fadeUp 0.9s 0.4s ease both;
+  }
+
+  .hero-ornament {
+    color: var(--gold-dim);
+    font-size: 28px;
+    letter-spacing: 8px;
+    margin: 28px 0 0;
+    animation: fadeUp 0.9s 0.5s ease both;
+  }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: translateY(0); } }
+
+  /* === SECTION BASE === */
+  section { padding: 70px 0; }
+  .section-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .section-header h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(22px, 3vw, 32px);
+    color: var(--gold);
+    text-shadow: 0 2px 10px rgba(232,168,32,0.3);
+    margin-bottom: 12px;
+  }
+  .section-header p {
+    color: var(--parchment-dim);
+    font-style: italic;
+    font-size: 15px;
+  }
+  .ornament-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0 0;
+    color: var(--gold-dim);
+  }
+  .ornament-line::before,
+  .ornament-line::after {
+    content: '';
+    flex: 1;
+    max-width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim));
+  }
+  .ornament-line::after { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+
+  /* === PARCHMENT CARD === */
+  .parchment-card {
+    background: var(--parchment);
+    color: #2c1808;
+    border-radius: 4px;
+    padding: 40px 48px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6), inset 0 0 60px rgba(180,120,40,0.1);
+    border: 1px solid #c09050;
+    position: relative;
+  }
+  .parchment-card::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(180,120,40,0.25);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .parchment-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: #5c2a08;
+    margin: 24px 0 10px;
+  }
+  .parchment-card h3:first-child { margin-top: 0; }
+  .parchment-card p { margin-bottom: 14px; line-height: 1.8; }
+  .parchment-card ul { padding-left: 20px; margin-bottom: 14px; }
+  .parchment-card li { margin-bottom: 6px; }
+  .parchment-card a { color: #8b3a0a; }
+
+  @media (max-width: 640px) { .parchment-card { padding: 28px 24px; } }
+
+  /* === ABOUT SECTION === */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; } }
+
+  /* === INFO BOXES === */
+  .info-box {
+    background: var(--bg-plank);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .info-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .info-box h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 10px;
+  }
+  .info-box p { font-size: 15px; color: var(--parchment-dim); margin: 0; }
+  .info-box strong { color: var(--gold-light); display: block; font-size: 18px; margin-top: 4px; font-style: normal; }
+
+  .info-boxes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 0;
+  }
+  @media (max-width: 480px) { .info-boxes-grid { grid-template-columns: 1fr; } }
+
+  /* === SCHEDULE SECTION === */
+  #harmonogram { background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-dark) 50%, var(--bg-deep) 100%); }
+
+  .schedule-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+  }
+  .schedule-table th {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 0 16px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-gold);
+  }
+  .schedule-table td {
+    background: var(--bg-plank);
+    padding: 16px 16px;
+    color: var(--parchment-dim);
+    font-size: 15px;
+  }
+  .schedule-table tr td:first-child {
+    border-radius: 4px 0 0 4px;
+    border-left: 2px solid var(--gold-dim);
+    color: var(--gold-light);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .schedule-table tr td:last-child { border-radius: 0 4px 4px 0; }
+  .badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-left: 8px;
+  }
+  .badge-regular { background: rgba(232,168,32,0.15); color: var(--gold-dim); border: 1px solid var(--gold-dim); }
+  .badge-special { background: rgba(201,76,12,0.15); color: var(--ember-glow); border: 1px solid var(--ember); }
+
+  /* === CALENDAR EMBED SECTION === */
+  .calendar-embed-box {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 28px;
+    text-align: center;
+    margin-top: 40px;
+    position: relative;
+  }
+  .calendar-embed-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--ember-glow), transparent);
+  }
+  .calendar-embed-box h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .calendar-placeholder-inner {
+    background: rgba(0,0,0,0.3);
+    border: 1px dashed rgba(232,168,32,0.2);
+    border-radius: 4px;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
+  }
+  .calendar-placeholder-inner .dice-icon { font-size: 40px; opacity: 0.4; }
+  .calendar-placeholder-inner code {
+    font-size: 12px;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 3px;
+    color: var(--parchment-dim);
+    font-style: normal;
+  }
+
+  /* === GAMES SECTION === */
+  #gry { background: var(--bg-deep); }
+
+  .bgg-embed-box {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bgg-embed-header {
+    background: var(--bg-plank);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-gold);
+  }
+  .bgg-embed-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .bgg-link {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--ember-glow);
+    text-decoration: none;
+    letter-spacing: 1px;
+    border: 1px solid var(--ember);
+    padding: 6px 14px;
+    border-radius: 2px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .bgg-link:hover { background: var(--ember); color: white; }
+
+  .bgg-embed-body {
+    min-height: 400px;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
+    padding: 40px;
+    text-align: center;
+  }
+  .bgg-embed-body .dice-icon { font-size: 48px; opacity: 0.35; }
+  .bgg-embed-body code {
+    font-size: 12px;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 14px;
+    border-radius: 3px;
+    color: var(--parchment-dim);
+    font-style: normal;
+  }
+
+  /* === SOCIAL SECTION === */
+  #dolacz { background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-dark) 100%); }
+
+  .social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .social-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 32px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s, box-shadow 0.25s;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .social-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+    background: rgba(255,255,255,0.04);
+  }
+  .social-card:hover { transform: translateY(-5px); border-color: var(--border-gold); }
+  .social-card:hover::before { opacity: 1; }
+
+  .social-card-aftergame { background: #1a0e0e; }
+  .social-card-facebook  { background: #0c1526; }
+  .social-card-instagram { background: #1a0c1a; }
+  .social-card-discord   { background: #0e1020; }
+
+  .social-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-size: 26px;
+  }
+  .si-aftergame { background: #c0392b; }
+  .si-facebook  { background: #1877f2; }
+  .si-instagram { background: linear-gradient(135deg, #f09433, #dc2743, #bc1888); }
+  .si-discord   { background: #5865f2; }
+
+  .social-card h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .social-card p { font-size: 13px; color: var(--text-muted); margin: 0; }
+  .social-arrow {
+    margin-top: 18px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  /* === FOOTER === */
+  footer {
+    background: var(--bg-dark);
+    border-top: 2px solid var(--border-gold);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .footer-brand {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .footer-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .footer-divider {
+    width: 80px;
+    height: 1px;
+    background: var(--border-gold);
+    margin: 20px auto;
+  }
+  .footer-copy {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">Fantasfera</a>
+    <ul class="nav-links">
+      <li><a href="#o-nas">O nas</a></li>
+      <li><a href="#harmonogram">Spotkania</a></li>
+      <li><a href="#gry">Gry</a></li>
+      <li><a href="#dolacz">Dołącz</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="iron-divider"></div>
+<section class="hero">
+  <div class="hero-logo-wrap">
+    <img src="Fantasfera_logo.png" alt="Fantasfera" class="hero-logo"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+    <span class="hero-logo-fallback" style="display:none;">Fantasfera</span>
+  </div>
+  <p class="hero-tagline">Trójmiejska Grupa Planszówkowa</p>
+  <h1 class="hero-title">Witaj w Tawernie!</h1>
+  <p class="hero-subtitle">Zbieramy się przy stole, rzucamy kośćmi i odkrywamy nowe światy. Przyjazna ekipa dla każdego — od nowicjusza po weterana planszówek.</p>
+  <div class="hero-ornament">✦ ✦ ✦</div>
+</section>
+<div class="iron-divider"></div>
+
+<!-- O NAS -->
+<section id="o-nas">
+  <div class="page-wrap">
+    <div class="section-header">
+      <h2>O naszej drużynie</h2>
+      <div class="ornament-line">✦</div>
+      <p>Poznaj Fantasferę — grupę, która podziela Twoją pasję do planszówek</p>
+    </div>
+
+    <div class="about-grid">
+      <div class="parchment-card">
+        <h3>Kto jesteśmy?</h3>
+        <p>Fantasfera to trójmiejska grupa pasjonatów nowoczesnych gier planszowych. Spotykamy się regularnie, by wspólnie odkrywać nowe tytuły, toczyć epickie bitwy i spędzać czas w świetnej atmosferze — zupełnie jak w starej, dobrej tawernie.</p>
+        <p>Gramy we wszystko: od lekkich gier rodzinnych, przez euro-gry i gry strategiczne, aż po ciężkie karcianki i RPG. Najważniejsza jest dla nas dobra zabawa i przyjazna atmosfera — bez względu na poziom zaawansowania.</p>
+
+        <h3>Dla kogo jesteśmy?</h3>
+        <p>Jeśli lubisz gry planszowe lub właśnie chcesz zacząć — Fantasfera jest dla Ciebie. Nowych graczy traktujemy jak gości tawerny: z otwartymi ramionami i cierpliwością przy tłumaczeniu zasad.</p>
+
+        <h3>Co oferujemy?</h3>
+        <ul>
+          <li>Regularne spotkania planszówkowe w Trójmieście</li>
+          <li>Naukę zasad i pomoc dla nowych graczy</li>
+          <li>Dostęp do szerokiej biblioteki gier na evencie</li>
+          <li>Eventy tematyczne, turnieje i rozgrywki RPG</li>
+          <li>Aktywną społeczność na Facebooku, Discordzie i Aftergame</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="info-boxes-grid">
+          <div class="info-box">
+            <h4>📍 Gdzie</h4>
+            <p>Trójmiasto</p>
+            <strong>Gdańsk / Gdynia / Sopot</strong>
+          </div>
+          <div class="info-box">
+            <h4>🎲 Rodzaj gier</h4>
+            <p>Planszówki & RPG</p>
+            <strong>Wszystkie gatunki</strong>
+          </div>
+          <div class="info-box">
+            <h4>👥 Nowi gracze</h4>
+            <p>Zawsze mile widziani!</p>
+            <strong>Brak wymagań</strong>
+          </div>
+          <div class="info-box">
+            <h4>🗓️ Spotkania</h4>
+            <p>Regularne eventy</p>
+            <strong>Zobacz harmonogram</strong>
+          </div>
+        </div>
+
+        <div class="info-box" style="border-color: rgba(201,76,12,0.5);">
+          <h4 style="color: var(--ember-glow);">🔥 Nowości &amp; Ogłoszenia</h4>
+          <p>Śledź nas na Aftergame i Facebooku, by nie przegapić żadnego eventu — ogłoszenia pojawiają się tam jako pierwsze!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="iron-divider"></div>
+
+<!-- HARMONOGRAM -->
+<section id="harmonogram">
+  <div class="page-wrap">
+    <div class="section-header">
+      <h2>Harmonogram Spotkań</h2>
+      <div class="ornament-line">✦</div>
+      <p>Kiedy i jak często zbieramy się przy stole</p>
+    </div>
+
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>Termin</th>
+          <th>Wydarzenie</th>
+          <th>Miejsce</th>
+          <th>Opis</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Każdy piątek</td>
+          <td>Wieczór Planszówkowy <span class="badge badge-regular">Cykl</span></td>
+          <td>Trójmiasto</td>
+          <td>Swobodne granie — wybieramy gry wspólnie na miejscu</td>
+        </tr>
+        <tr>
+          <td>Co 2 tygodnie</td>
+          <td>Sesja RPG <span class="badge badge-special">Specjalne</span></td>
+          <td>Gdańsk</td>
+          <td>Kampanie i one-shoty dla stałych graczy i nowicjuszy</td>
+        </tr>
+        <tr>
+          <td>Raz w miesiącu</td>
+          <td>Turniej &amp; Rywalizacja <span class="badge badge-special">Turniej</span></td>
+          <td>Rotacyjnie</td>
+          <td>Zorganizowana rywalizacja w wybranym tytule z nagrodami</td>
+        </tr>
+        <tr>
+          <td>Ad hoc</td>
+          <td>Spontaniczne Eventy</td>
+          <td>Trójmiasto</td>
+          <td>Nowe tytuły, premiery, testy prototypów — ogłoszenia na bieżąco</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="calendar-embed-box">
+      <h3>📅 Najbliższe wydarzenia</h3>
+      <!--
+        === INSTRUKCJA AFTERGAME EMBED ===
+        Wklej tutaj kod iframe z Aftergame, zastępując cały blok .calendar-placeholder-inner.
+        Przykład:
+        <iframe src="https://aftergame.app/groups/fantasfera/embed" width="100%" height="500" frameborder="0"></iframe>
+      -->
+      <div class="calendar-placeholder-inner">
+        <div class="dice-icon">🎲</div>
+        <p>Tutaj pojawi się kalendarz wydarzeń z Aftergame</p>
+        <code>&lt;iframe src="https://aftergame.app/groups/fantasfera/embed" ...&gt;&lt;/iframe&gt;</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="iron-divider"></div>
+
+<!-- KATALOG GIER -->
+<section id="gry">
+  <div class="page-wrap">
+    <div class="section-header">
+      <h2>Nasza Biblioteka Gier</h2>
+      <div class="ornament-line">✦</div>
+      <p>Tytuły, w które gramy najchętniej — katalog z BoardGameGeek</p>
+    </div>
+
+    <div class="bgg-embed-box">
+      <div class="bgg-embed-header">
+        <h3>Kolekcja Fantasfery</h3>
+        <a href="https://boardgamegeek.com" target="_blank" rel="noopener" class="bgg-link">Otwórz BGG →</a>
+      </div>
+      <div class="bgg-embed-body">
+        <!--
+          === INSTRUKCJA BGG EMBED ===
+          Opcja 1 (Widget BGG):
+          Zarejestruj kolekcję na BGG i wklej tutaj widżet:
+          <script src="https://www.boardgamegeek.com/boardgamegeekwidget.js"></script>
+
+          Opcja 2 (Prosty link do profilu):
+          Zastąp ten blok linkiem do Twojego profilu BGG lub listy gier.
+
+          Opcja 3 (Iframe z listą gier):
+          <iframe src="https://boardgamegeek.com/collection/user/TWOJA_NAZWA?subtype=boardgame&geekranks=..." ...></iframe>
+        -->
+        <div class="dice-icon">♟️</div>
+        <p>Tutaj pojawi się Twój katalog gier z BoardGameGeek</p>
+        <code>&lt;!-- Wklej tutaj kod embed z BGG --&gt;</code>
+        <p style="font-size: 12px; max-width: 420px; line-height: 1.6;">
+          Utwórz kolekcję na <strong>boardgamegeek.com</strong>, a następnie skopiuj link do widżetu lub iframe i wklej go w miejsce tego bloku.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="iron-divider"></div>
+
+<!-- DOŁĄCZ / SOCIAL -->
+<section id="dolacz">
+  <div class="page-wrap">
+    <div class="section-header">
+      <h2>Znajdź nas w sieci</h2>
+      <div class="ornament-line">✦</div>
+      <p>Dołącz do naszej społeczności — wybierz swój ulubiony kanał</p>
+    </div>
+
+    <div class="social-grid">
+      <a href="https://aftergame.app/groups/fantasfera" target="_blank" rel="noopener" class="social-card social-card-aftergame">
+        <div class="social-icon si-aftergame">🎯</div>
+        <h4>Aftergame</h4>
+        <p>Eventy, zapisy i kalendarz spotkań</p>
+        <div class="social-arrow">Odkryj nas →</div>
+      </a>
+
+      <a href="https://www.facebook.com/fantasfera" target="_blank" rel="noopener" class="social-card social-card-facebook">
+        <div class="social-icon si-facebook">f</div>
+        <h4>Facebook</h4>
+        <p>Aktualności, ogłoszenia i relacje ze spotkań</p>
+        <div class="social-arrow">Obserwuj →</div>
+      </a>
+
+      <a href="https://www.instagram.com/fanta.sfera" target="_blank" rel="noopener" class="social-card social-card-instagram">
+        <div class="social-icon si-instagram">📷</div>
+        <h4>Instagram</h4>
+        <p>Zdjęcia z gier i kulisy spotkań</p>
+        <div class="social-arrow">Śledź nas →</div>
+      </a>
+
+      <a href="https://discord.gg/NsTztxrE8X" target="_blank" rel="noopener" class="social-card social-card-discord">
+        <div class="social-icon si-discord">💬</div>
+        <h4>Discord</h4>
+        <p>Czat na żywo i rozmowy o grach 24/7</p>
+        <div class="social-arrow">Dołącz →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Fantasfera</div>
+  <p class="footer-sub">Trójmiejska Grupa Planszówkowa · Gdańsk · Gdynia · Sopot</p>
+  <div class="footer-divider"></div>
+  <p class="footer-copy">&copy; 2026 Fantasfera &nbsp;·&nbsp; Wszelkie prawa do rzutów kostką zastrzeżone &nbsp;🎲</p>
+</footer>
+
+</body>
+</html>
