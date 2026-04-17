@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-04-17] — Przeniesienie wtyczki Facebook pod widget Aftergame
+
+### Zmiany
+- Wtyczka Facebook Page Plugin przeniesiona z sekcji "Znajdź nas w sieci" do sekcji Harmonogram, bezpośrednio pod widget Aftergame
+- Poprawiono responsywność wtyczki: `.fb-embed-inner` ustawiony na `width: 100%`, iframe Facebooka rozciąga się do szerokości kontenera
+
+---
+
 ## [2026-04-17] — Facebook Page Plugin + poprawki logo w nawigacji
 
 ### Nowe funkcje
