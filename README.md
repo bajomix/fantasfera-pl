@@ -8,7 +8,7 @@ Oficjalna strona **Fantasfery** — trójmiejskiej grupy pasjonatów gier plansz
 
 ## O stronie
 
-Strona statyczna (HTML + CSS + JS) hostowana na InfinityFree. Zaprojektowana w klimacie średniowiecznej tawerny — ciemne drewno, złote akcenty, czcionki Cinzel i Lora.
+Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana w klimacie średniowiecznej tawerny — ciemne drewno, złote akcenty, czcionki Cinzel i Lora.
 
 ### Sekcje
 
@@ -26,9 +26,8 @@ Strona statyczna (HTML + CSS + JS) hostowana na InfinityFree. Zaprojektowana w k
 
 - **HTML5 / CSS3** — bez frameworków, czysty vanilla
 - **Google Fonts** — Cinzel Decorative, Cinzel, Lora
-- **JavaScript** — widget kalendarza Google (iCal parser)
-- **PHP** — `ical-proxy.php` (nieaktywny, InfinityFree blokuje outbound HTTP)
-- **Hosting** — InfinityFree (HTTPS, PHP 7/8)
+- **JavaScript** — widget kalendarza Google (iCal parser + CORS proxy)
+- **Hosting** — GitHub Pages (domena niestandardowa: `fantasfera.pl`, HTTPS automatyczny)
 
 ---
 
@@ -46,20 +45,25 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 
 ```
 /
-├── index.html                  # Strona główna
-├── ical-proxy.php              # PHP proxy dla kalendarza (nieaktywny)
-├── directory/.htaccess         # Konfiguracja serwera InfinityFree
-├── Fantasfera_logo.png         # Logo graficzne (kwadrat)
+├── index.html                      # Strona główna
+├── CNAME                           # Domena niestandardowa dla GitHub Pages
+├── Fantasfera_logo.png             # Logo graficzne (kwadrat)
 ├── Logo_bez_deski_transparent.png  # Logo hero (bez tła)
-├── Napis_transparent.png       # Logo tekstowe (nawigacja, stopka)
-├── aftergame.png               # Ikona Aftergame
-├── Facebook_Logo_Primary.png   # Ikona Facebook
-├── Instagram_Glyph_White.png   # Ikona Instagram (biała)
-├── Instagram_Glyph_Gradient.png # Ikona Instagram (gradient)
-├── Discord-Symbol-Blurple.png  # Ikona Discord
+├── Napis_transparent.png           # Logo tekstowe (nawigacja, stopka)
+├── aftergame.png                   # Ikona Aftergame
+├── Facebook_Logo_Primary.png       # Ikona Facebook
+├── Instagram_Glyph_White.png       # Ikona Instagram (biała)
+├── Instagram_Glyph_Gradient.png    # Ikona Instagram (gradient)
+├── Discord-Symbol-Blurple.png      # Ikona Discord
 ├── README.md
 └── CHANGELOG.md
 ```
+
+---
+
+## Deployment
+
+Strona jest automatycznie publikowana przez GitHub Pages przy każdym pushu na gałąź `main`.
 
 ---
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## [2026-04-17] — Migracja na GitHub Pages
+
+### Zmiany hostingu
+- Przeniesiono hosting z InfinityFree na **GitHub Pages**
+- Strona publikowana automatycznie z gałęzi `main` przy każdym pushu
+- HTTPS obsługiwany natywnie przez GitHub Pages
+
+### Usunięte pliki
+- `ical-proxy.php` — PHP proxy zbędne, GitHub Pages nie obsługuje PHP; widget kalendarza działa przez CORS proxy w JS
+- `directory/.htaccess` — konfiguracja specyficzna dla InfinityFree (przekierowania HTTP→HTTPS, strony błędów 403/404/500); GitHub Pages obsługuje to natywnie
+
+---
+
 ## [2026-04-17] — Widget kalendarza Google + poprawki UI
 
 ### Nowe funkcje
