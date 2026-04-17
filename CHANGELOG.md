@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-04-17] — Poprawki tabeli harmonogramu
+
+### Zmiany UI
+- Tabela harmonogramu (Termin / Wydarzenie / Miejsce / Opis):
+  - `table-layout: fixed` z `colgroup` — kolumny o stałych proporcjach (14% / 34% / 20% / 32%)
+  - `vertical-align: middle` — tekst wyśrodkowany pionowo we wszystkich komórkach
+  - Zwiększony padding komórek (`18px 20px`)
+  - Badge "Cykliczne" / "Specjalne" zawsze w jednej linii z tytułem: komórka wydarzeń oparta na flexbox (`event-cell`), tytuł rozciąga się (`flex: 1`), badge przypięty do prawej — działa poprawnie nawet gdy tytuł się zawija
+
+---
+
 ## [2026-04-17] — Migracja na GitHub Pages
 
 ### Zmiany hostingu
