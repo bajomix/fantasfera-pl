@@ -17,8 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: pip install cloudscraper requests
+      - name: Install Python dependencies
+        run: pip install cloudscraper requests playwright
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
 
       - name: Fetch BGG data and build collection JSON
         env:

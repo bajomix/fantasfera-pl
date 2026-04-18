@@ -1,5 +1,14 @@
 # Changelog
 
+## [2026-04-18] — BGG weight fetch: Playwright (headless Chrome)
+
+### Zmiany
+- Skrypt przepisany na Playwright — headless Chromium loguje się do BGG przez formularz, przechwytuje Bearer JWT z nagłówków `Authorization` wychodzących requestów API, następnie używa go do zapytań thing XML API
+- GitHub Action zaktualizowany: instaluje `playwright` + `playwright install chromium --with-deps`
+- Rozwiązuje problem 401 z datacenter IP — BGG blokuje xmlapi2/thing z Azure IP, ale Bearer JWT (z prawdziwej sesji browserowej) pozwala ominąć blokadę
+
+---
+
 ## [2026-04-18] — Katalog gier: paginacja + naprawa BGG weight fetch
 
 ### Zmiany
