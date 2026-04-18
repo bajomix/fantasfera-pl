@@ -1,5 +1,23 @@
 # Changelog
 
+## [2026-04-18] — Katalog gier BGG + GitHub Action do synchronizacji
+
+### Nowe funkcje
+- **Sekcja "Katalog Gier"** zastępuje placeholder BGG:
+  - Grid okładek pobierany z kolekcji BGG użytkownika Bajomix
+  - Badge trudności na okładce: Początkujący / Łatwy / Średni / Zaawansowany / Ekspercki (na podstawie `averageweight` z BGG)
+  - Liczba graczy i czas gry przy każdej grze
+  - Link do strony gry na BGG
+  - Wyszukiwarka po tytule
+  - Filtry po liczbie graczy (2 / 3 / 4 / 5 / 6+)
+- **GitHub Action** (`.github/workflows/update-bgg.yml`): co poniedziałek o 4:00 UTC pobiera kolekcję z BGG API i zapisuje jako `bgg-collection.xml` w repo; dostępny też ręczny trigger z GitHub UI
+
+### Architektura
+- Frontend ładuje `/bgg-collection.xml` (same-origin, zero CORS) — fallback na live BGG API przez proxy
+- BGG API blokuje zapytania server-side z publicznych IP (401 Cloudflare); GitHub Actions może omijać ten limit; jeśli nie — użytkownik może ręcznie wgrać plik z eksportu BGG
+
+---
+
 ## [2026-04-18] — Responsywność mobilna + fix kalendarza CORS + favicon
 
 ### Nowe funkcje

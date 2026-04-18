@@ -477,62 +477,102 @@
   /* === GAMES SECTION === */
   #gry { background: var(--bg-deep); }
 
-  .bgg-embed-box {
-    background: var(--bg-dark);
+  .games-controls { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+  .games-search {
+    width: 100%;
+    background: var(--bg-plank);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 11px 16px;
+    color: var(--text-main);
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .games-search::placeholder { color: var(--text-muted); }
+  .games-search:focus { border-color: var(--gold-dim); }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filter-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    background: var(--bg-plank);
+    border: 1px solid var(--border-gold);
+    border-radius: 2px;
+    color: var(--parchment-dim);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { background: rgba(232,168,32,0.15); border-color: var(--gold-dim); color: var(--gold-light); }
+
+  #games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 18px;
+  }
+  .game-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-plank);
     border: 1px solid var(--border-gold);
     border-radius: 4px;
     overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
   }
-  .bgg-embed-header {
-    background: var(--bg-plank);
-    padding: 18px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border-gold);
+  .game-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+  .game-cover {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--bg-dark);
+    flex-shrink: 0;
   }
-  .bgg-embed-header h3 {
+  .game-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .game-no-cover { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48px; opacity: 0.3; }
+  .diff-badge {
+    position: absolute;
+    bottom: 7px;
+    left: 7px;
     font-family: 'Cinzel', serif;
-    font-size: 16px;
-    color: var(--gold);
-    letter-spacing: 2px;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    padding: 3px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    font-weight: 600;
     text-transform: uppercase;
   }
-  .bgg-link {
+  .diff-beginner { background: rgba(30,120,30,0.92);  color: #d0ffd0; }
+  .diff-easy     { background: rgba(170,120,0,0.92);  color: #fff5c0; }
+  .diff-medium   { background: rgba(195,85,0,0.92);   color: #ffe4c0; }
+  .diff-hard     { background: rgba(170,30,30,0.92);  color: #ffd0d0; }
+  .diff-expert   { background: rgba(90,0,110,0.92);   color: #f0d0ff; }
+  .game-info { padding: 11px 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+  .game-title {
     font-family: 'Cinzel', serif;
     font-size: 12px;
-    color: var(--ember-glow);
-    text-decoration: none;
-    letter-spacing: 1px;
-    border: 1px solid var(--ember);
-    padding: 6px 14px;
-    border-radius: 2px;
-    transition: background 0.2s, color 0.2s;
+    color: var(--parchment);
+    line-height: 1.4;
+    letter-spacing: 0.3px;
   }
-  .bgg-link:hover { background: var(--ember); color: white; }
-
-  .bgg-embed-body {
-    min-height: 400px;
-    background: rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    color: var(--text-muted);
-    font-size: 14px;
-    font-style: italic;
-    padding: 40px;
+  .game-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--text-muted); }
+  .games-loading, .games-empty {
+    grid-column: 1 / -1;
     text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 60px 20px;
   }
-  .bgg-embed-body .dice-icon { font-size: 48px; opacity: 0.35; }
-  .bgg-embed-body code {
-    font-size: 12px;
-    background: rgba(0,0,0,0.4);
-    padding: 6px 14px;
-    border-radius: 3px;
-    color: var(--parchment-dim);
-    font-style: normal;
+  @media (max-width: 640px) {
+    #games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .filter-btn { font-size: 10px; padding: 6px 10px; }
   }
 
   /* === SOCIAL SECTION === */
@@ -961,36 +1001,25 @@
 <section id="gry">
   <div class="page-wrap">
     <div class="section-header">
-      <h2>Nasza Biblioteka Gier</h2>
+      <h2>Katalog Gier</h2>
       <div class="ornament-line">✦</div>
-      <p>Tytuły, w które gramy najchętniej — katalog z BoardGameGeek</p>
+      <p>Nasza kolekcja — tytuły, w które gramy na spotkaniach</p>
     </div>
 
-    <div class="bgg-embed-box">
-      <div class="bgg-embed-header">
-        <h3>Kolekcja Fantasfery</h3>
-        <a href="https://boardgamegeek.com" target="_blank" rel="noopener" class="bgg-link">Otwórz BGG →</a>
+    <div class="games-controls">
+      <input type="search" class="games-search" placeholder="Szukaj gry po tytule…" autocomplete="off">
+      <div class="filter-row">
+        <button class="filter-btn active" data-players="all">Wszyscy</button>
+        <button class="filter-btn" data-players="2">2 graczy</button>
+        <button class="filter-btn" data-players="3">3 graczy</button>
+        <button class="filter-btn" data-players="4">4 graczy</button>
+        <button class="filter-btn" data-players="5">5 graczy</button>
+        <button class="filter-btn" data-players="6">6+ graczy</button>
       </div>
-      <div class="bgg-embed-body">
-        <!--
-          === INSTRUKCJA BGG EMBED ===
-          Opcja 1 (Widget BGG):
-          Zarejestruj kolekcję na BGG i wklej tutaj widżet:
-          <script src="https://www.boardgamegeek.com/boardgamegeekwidget.js"></script>
+    </div>
 
-          Opcja 2 (Prosty link do profilu):
-          Zastąp ten blok linkiem do Twojego profilu BGG lub listy gier.
-
-          Opcja 3 (Iframe z listą gier):
-          <iframe src="https://boardgamegeek.com/collection/user/TWOJA_NAZWA?subtype=boardgame&geekranks=..." ...></iframe>
-        -->
-        <div class="dice-icon">♟️</div>
-        <p>Tutaj pojawi siękatalog gier z BoardGameGeek</p>
-        <code>&lt;!-- Wklej tutaj kod embed z BGG --&gt;</code>
-        <p style="font-size: 12px; max-width: 420px; line-height: 1.6;">
-          Utwórz kolekcję na <strong>boardgamegeek.com</strong>, a następnie skopiuj link do widżetu lub iframe i wklej go w miejsce tego bloku.
-        </p>
-      </div>
+    <div id="games-grid">
+      <p class="games-loading">Ładowanie kolekcji…</p>
     </div>
   </div>
 </section>
@@ -1146,6 +1175,147 @@
     .catch(function() {
       widget.innerHTML = '<p class="cal-empty">Nie udało się załadować kalendarza. Spróbuj odświeżyć stronę.</p>';
     });
+})();
+
+/* === BGG GAMES CATALOG === */
+(function() {
+  'use strict';
+  var BGG_URL = 'https://boardgamegeek.com/xmlapi2/collection?username=Bajomix&stats=1&own=1';
+  var PROXIES = [
+    function(u) { return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
+    function(u) { return 'https://corsproxy.io/?' + u; },
+    function(u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
+    function(u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); },
+  ];
+  var allGames = [], searchQuery = '', playerFilter = 'all';
+  var grid = document.getElementById('games-grid');
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fetchProxy(url, pi, retries) {
+    pi = pi || 0; retries = retries || 0;
+    if (pi >= PROXIES.length) return Promise.reject(new Error('all proxies failed'));
+    return fetch(PROXIES[pi](url), { cache: 'no-cache' })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text && text.indexOf('accepted and will be processed') > -1) {
+          if (retries < 4) return new Promise(function(res) {
+            setTimeout(function() { res(fetchProxy(url, pi, retries + 1)); }, 3000);
+          });
+          throw new Error('BGG timeout');
+        }
+        return text;
+      })
+      .catch(function() { return fetchProxy(url, pi + 1, 0); });
+  }
+
+  function parseGames(xml) {
+    var doc = new DOMParser().parseFromString(xml, 'application/xml');
+    var out = [];
+    doc.querySelectorAll('item').forEach(function(item) {
+      var nameEl = item.querySelector('name');
+      var thumbEl = item.querySelector('thumbnail');
+      var stats = item.querySelector('stats');
+      var wEl = item.querySelector('averageweight');
+      var w = wEl ? (+wEl.getAttribute('value') || +wEl.textContent || 0) : 0;
+      out.push({
+        id:   item.getAttribute('objectid'),
+        name: nameEl ? nameEl.textContent.trim() : '?',
+        thumb: thumbEl ? thumbEl.textContent.trim() : '',
+        min:  stats ? (+stats.getAttribute('minplayers') || 0) : 0,
+        max:  stats ? (+stats.getAttribute('maxplayers') || 0) : 0,
+        minT: stats ? (+stats.getAttribute('minplaytime') || 0) : 0,
+        maxT: stats ? (+stats.getAttribute('maxplaytime') || 0) : 0,
+        w:    w,
+      });
+    });
+    return out;
+  }
+
+  function diffBadge(w) {
+    if (!w || w <= 0) return '';
+    var l, c;
+    if      (w < 2.3)  { l = 'Początkujący'; c = 'diff-beginner'; }
+    else if (w < 3.0)  { l = 'Łatwy';        c = 'diff-easy';     }
+    else if (w < 3.6)  { l = 'Średni';        c = 'diff-medium';   }
+    else if (w <= 4.1) { l = 'Zaawansowany';  c = 'diff-hard';     }
+    else               { l = 'Ekspercki';      c = 'diff-expert';   }
+    return '<span class="diff-badge ' + c + '">' + l + '</span>';
+  }
+
+  function renderGame(g) {
+    var players = (g.min && g.max)
+      ? (g.min === g.max ? g.min : g.min + '–' + g.max) + ' graczy' : '';
+    var time = g.maxT
+      ? (g.minT && g.minT !== g.maxT ? g.minT + '–' + g.maxT : g.maxT) + ' min' : '';
+    return '<a class="game-card" href="https://boardgamegeek.com/boardgame/' + esc(g.id) + '" target="_blank" rel="noopener">' +
+      '<div class="game-cover">' +
+        (g.thumb ? '<img src="' + esc(g.thumb) + '" alt="' + esc(g.name) + '" loading="lazy">' : '<div class="game-no-cover">♟</div>') +
+        diffBadge(g.w) +
+      '</div>' +
+      '<div class="game-info">' +
+        '<p class="game-title">' + esc(g.name) + '</p>' +
+        '<div class="game-meta">' +
+          (players ? '<span>👥 ' + esc(players) + '</span>' : '') +
+          (time ? '<span>⏱ ' + esc(time) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</a>';
+  }
+
+  function applyFilters() {
+    if (!grid) return;
+    var q = searchQuery.toLowerCase();
+    var filtered = allGames.filter(function(g) {
+      if (q && g.name.toLowerCase().indexOf(q) < 0) return false;
+      if (playerFilter !== 'all') {
+        var p = +playerFilter;
+        return p >= 6 ? g.max >= 6 : (g.min <= p && g.max >= p);
+      }
+      return true;
+    });
+    grid.innerHTML = filtered.length
+      ? filtered.map(renderGame).join('')
+      : '<p class="games-empty">Brak gier spełniających kryteria.</p>';
+  }
+
+  function loadGames() {
+    return fetch('/bgg-collection.xml', { cache: 'no-cache' })
+      .then(function(r) {
+        if (!r.ok) throw new Error('no local cache');
+        return r.text();
+      })
+      .then(function(text) {
+        if (!text || text.indexOf('<items') < 0) throw new Error('invalid local cache');
+        return text;
+      })
+      .catch(function() { return fetchProxy(BGG_URL); });
+  }
+
+  loadGames()
+    .then(function(text) {
+      if (!text || text.indexOf('<items') < 0) throw new Error('invalid');
+      allGames = parseGames(text).sort(function(a, b) { return a.name.localeCompare(b.name); });
+      if (!allGames.length) { grid.innerHTML = '<p class="games-empty">Kolekcja jest pusta.</p>'; return; }
+      applyFilters();
+    })
+    .catch(function() {
+      if (grid) grid.innerHTML = '<p class="games-empty">Nie udało się załadować kolekcji. Spróbuj odświeżyć stronę.</p>';
+    });
+
+  var si = document.querySelector('.games-search');
+  if (si) si.addEventListener('input', function() { searchQuery = this.value; applyFilters(); });
+
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      playerFilter = this.dataset.players;
+      applyFilters();
+    });
+  });
 })();
 
 (function() {

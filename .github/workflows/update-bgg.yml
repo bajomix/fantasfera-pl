@@ -1,0 +1,42 @@
+name: Update BGG Collection
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'  # Every Monday at 4am UTC
+  workflow_dispatch:       # Manual trigger from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch BGG collection (with retry)
+        run: |
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i..."
+            curl -s -A "Mozilla/5.0 (compatible; BGGFetcher/1.0)" \
+              -o bgg_tmp.xml \
+              "https://boardgamegeek.com/xmlapi2/collection?username=Bajomix&stats=1&own=1"
+            if grep -q '<items' bgg_tmp.xml; then
+              echo "Valid response received."
+              mv bgg_tmp.xml bgg-collection.xml
+              break
+            fi
+            echo "BGG not ready yet (attempt $i), waiting 15s..."
+            sleep 15
+          done
+          if [ ! -f bgg-collection.xml ]; then
+            echo "Failed to fetch BGG collection after 5 attempts."
+            exit 1
+          fi
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bgg-collection.xml
+          git diff --staged --quiet || (git commit -m "Update BGG collection data [skip ci]" && git push)
