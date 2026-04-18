@@ -80,32 +80,35 @@ def find_weight_in_dict(d, depth=0):
                 return result
     return None
 
-# Probe first game to understand JSON structure
+# Probe multiple internal BGG endpoints to find one with weight data
 probe_id = ids[0]
-probe_url = f'https://api.geekdo.com/api/geekitems?objecttype=thing&objectid={probe_id}&subtype=boardgame&ajax=1'
-probe_resp = fresh.get(probe_url, timeout=15)
-print(f"\nProbe game {probe_id}: HTTP {probe_resp.status_code}")
-if probe_resp.status_code == 200:
-    probe_data = probe_resp.json()
-    probe_item = probe_data.get('item', {})
-    print(f"  item keys: {list(probe_item.keys())}")
-    probe_stats = probe_item.get('stats', {})
-    print(f"  stats keys: {list(probe_stats.keys())}")
-    # Print full item JSON (truncated)
-    item_json = json.dumps(probe_item)
-    print(f"  item JSON (first 1000): {item_json[:1000]}")
-    # Also try with showstats=1
-    probe_resp2 = fresh.get(probe_url + '&showstats=1', timeout=15)
-    print(f"  showstats=1: HTTP {probe_resp2.status_code}")
-    if probe_resp2.status_code == 200:
-        d2 = probe_resp2.json()
-        i2 = d2.get('item', {})
-        print(f"  showstats item keys: {list(i2.keys())}")
-        s2 = i2.get('stats', {})
-        print(f"  showstats stats keys: {list(s2.keys())}")
-        print(f"  showstats stats: {json.dumps(s2)[:400]}")
-    w = find_weight_in_dict(probe_data)
-    print(f"  auto-detected weight: {w}")
+print(f"\n--- Probing endpoints for game {probe_id} ---")
+probe_endpoints = [
+    ('geekrating',   f'https://api.geekdo.com/api/geekrating?objecttype=thing&objectid={probe_id}&subtype=boardgame&ajax=1'),
+    ('geekratings',  f'https://api.geekdo.com/api/geekratings?objectids={probe_id}&objecttype=thing&subtype=boardgame&ajax=1'),
+    ('ratings',      f'https://api.geekdo.com/api/ratings?objecttype=thing&objectid={probe_id}&subtype=boardgame'),
+    ('thing-base',   f'https://boardgamegeek.com/xmlapi2/thing?id={probe_id}'),
+]
+for label, url in probe_endpoints:
+    try:
+        resp = fresh.get(url, timeout=15)
+        w = find_weight_in_dict(resp.json()) if resp.status_code == 200 and 'json' in resp.headers.get('content-type','') else None
+        print(f"  [{label}]: HTTP {resp.status_code}, weight={w}, preview={resp.text[:200]!r}")
+    except Exception as e:
+        print(f"  [{label}]: ERROR {e}")
+    time.sleep(1)
+# Authed variants
+for label, url in [
+    ('authed/geekrating', f'https://api.geekdo.com/api/geekrating?objecttype=thing&objectid={probe_id}&subtype=boardgame&ajax=1'),
+    ('authed/thing',      f'https://boardgamegeek.com/xmlapi2/thing?stats=1&id={probe_id}'),
+]:
+    try:
+        resp = authed.get(url, timeout=15)
+        print(f"  [{label}]: HTTP {resp.status_code}, preview={resp.text[:200]!r}")
+    except Exception as e:
+        print(f"  [{label}]: ERROR {e}")
+    time.sleep(1)
+print("--- End probe ---\n")
 time.sleep(2)
 
 # Fetch weights for all games
