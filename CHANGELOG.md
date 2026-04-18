@@ -1,5 +1,14 @@
 # Changelog
 
+## [2026-04-18] — Katalog gier: paginacja + naprawa BGG weight fetch
+
+### Zmiany
+- **Paginacja katalogu gier** — lista podzielona na strony po 3 wiersze (dynamicznie obliczane wg szerokości siatki × 3); przyciski Poprzednia/Następna z licznikiem stron; zmiana filtra lub wyszukiwarki resetuje do strony 1; scroll do siatki z offsetem 90px dla sticky navbara
+- **Naprawa scope paginacji** — fix bugu gdzie `currentPage++` w callbacku modyfikował lokalny parametr zamiast zmiennej z closure
+- **BGG weight fetch — diagnoza** — BGG XML API v1 i v2 zwracają 401 ze wszystkich metod (fresh/authed/cloudscraper) dla IP datacenter (GitHub Actions = Azure); `api.geekdo.com/api/geekitems` zwraca HTTP 200 — skrypt przepisany na per-game JSON API; probe diagnostyczny drukuje pełną strukturę JSON itema
+
+---
+
 ## [2026-04-18] — Katalog gier: filtry trudności + badge'y + JSON z weight
 
 ### Zmiany
