@@ -17,7 +17,7 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 | **Hero** | Logo, hasło, wstęp |
 | **O nas** | Opis grupy, karty informacyjne (Gdzie / Rodzaj gier / Nowi gracze / Spotkania) |
 | **Harmonogram** | Tabela cyklicznych spotkań + widget kalendarza Google + widget Aftergame + Facebook Page Plugin |
-| **Biblioteka Gier** | Placeholder na embed BoardGameGeek |
+| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); filtrowanie po trudności; wyszukiwarka; paginacja (3 wiersze / strona) |
 | **Znajdź nas w sieci** | Linki do Aftergame, Facebooka, Instagrama, Discorda |
 
 ---
@@ -26,7 +26,7 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 
 - **HTML5 / CSS3** — bez frameworków, czysty vanilla
 - **Google Fonts** — Cinzel Decorative, Cinzel, Lora
-- **JavaScript** — widget kalendarza Google (iCal parser + CORS proxy)
+- **JavaScript** — widget kalendarza Google (iCal parser + CORS proxy), katalog gier BGG (JSON fetch + paginacja)
 - **Hosting** — GitHub Pages (domena niestandardowa: `fantasfera.pl`, HTTPS automatyczny)
 
 ---
@@ -46,6 +46,7 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 ```
 /
 ├── index.html                      # Strona główna
+├── bgg-collection.json             # Kolekcja BGG (generowana przez GitHub Action)
 ├── CNAME                           # Domena niestandardowa dla GitHub Pages
 ├── Fantasfera_logo.png             # Logo graficzne (kwadrat)
 ├── Logo_bez_deski_transparent.png  # Logo hero (bez tła)
@@ -55,6 +56,10 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 ├── Instagram_Glyph_White.png       # Ikona Instagram (biała)
 ├── Instagram_Glyph_Gradient.png    # Ikona Instagram (gradient)
 ├── Discord-Symbol-Blurple.png      # Ikona Discord
+├── dice_favicon.png                # Favicon
+├── .github/
+│   ├── workflows/update-bgg.yml    # GitHub Action: cotygodniowa sync kolekcji BGG
+│   └── scripts/fetch_bgg.py        # Skrypt Python: pobiera kolekcję + wagi z BGG API
 ├── README.md
 └── CHANGELOG.md
 ```
@@ -64,6 +69,18 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 ## Deployment
 
 Strona jest automatycznie publikowana przez GitHub Pages przy każdym pushu na gałąź `main`.
+
+---
+
+## Katalog Gier BGG
+
+Dane kolekcji pobierane są przez GitHub Action (`.github/workflows/update-bgg.yml`):
+- Uruchamiany co poniedziałek o 4:00 UTC + ręczny trigger
+- Skrypt `fetch_bgg.py` loguje się do BGG, pobiera kolekcję użytkownika `Bajomix` przez XML API v2, następnie pobiera wagi złożoności (`averageweight`) przez wewnętrzne JSON API BGG (`api.geekdo.com/api/geekitems`)
+- Wynik zapisywany jako `bgg-collection.json` i commitowany do repo
+- Frontend czyta `/bgg-collection.json` (same-origin, zero CORS)
+
+> **Uwaga:** BGG XML API (v1 i v2) zwraca 401 dla IP datacenter (GitHub Actions = Azure). Wagi pobierane są przez wewnętrzne API geekitems które działa bez auth.
 
 ---
 
