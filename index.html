@@ -636,6 +636,102 @@
     color: var(--gold-dim);
   }
 
+  /* === HAMBURGER BUTTON === */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+    background: none;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* === MOBILE === */
+  @media (max-width: 640px) {
+    section { padding: 44px 0; }
+    .page-wrap { padding: 0 16px; }
+
+    /* NAV */
+    .nav-hamburger { display: flex; }
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: var(--bg-dark);
+      border-bottom: 2px solid var(--border-gold);
+      flex-direction: column;
+      padding: 8px 0;
+      gap: 0;
+      z-index: 99;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links li { width: 100%; }
+    .nav-links a {
+      display: block;
+      font-size: 14px;
+      padding: 14px 24px;
+      border-bottom: 1px solid rgba(232,168,32,0.12);
+    }
+    .nav-links li:last-child a { border-bottom: none; }
+
+    /* SCHEDULE TABLE → CARDS */
+    .schedule-table { display: block; }
+    .schedule-table colgroup,
+    .schedule-table thead { display: none; }
+    .schedule-table tbody { display: flex; flex-direction: column; gap: 12px; }
+    .schedule-table tr {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-plank);
+      border-left: 3px solid var(--gold-dim);
+      border-radius: 4px;
+      padding: 14px 16px;
+      gap: 4px;
+    }
+    .schedule-table td {
+      display: block;
+      background: none;
+      padding: 0;
+      border: none !important;
+      border-radius: 0 !important;
+      font-size: 14px;
+    }
+    .schedule-table tr td:first-child {
+      border-left: none !important;
+      font-size: 11px;
+      color: var(--ember-glow);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: normal;
+    }
+    .schedule-table tr td:last-child { display: none; }
+    .event-cell { flex-wrap: wrap; gap: 6px; align-items: center; }
+    .event-cell .event-name { color: var(--parchment); font-size: 15px; flex: unset; }
+
+    /* CALENDAR */
+    .cal-title { white-space: normal; }
+    .cal-event { padding: 12px 14px; gap: 12px; }
+
+    /* FB widget */
+    .fb-embed-box { padding: 16px 16px 0; }
+  }
+
   /* === FOOTER === */
   footer {
     background: var(--bg-dark);
@@ -689,6 +785,9 @@
 <nav>
   <div class="nav-inner">
     <a href="#" class="nav-brand"><img src="Napis_transparent.png" alt="Fantasfera" class="nav-logo"></a>
+    <button class="nav-hamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <ul class="nav-links">
       <li><a href="#o-nas">O nas</a></li>
       <li><a href="#harmonogram">Spotkania</a></li>
@@ -1009,8 +1108,10 @@
 
   var ICAL_URL = 'https://calendar.google.com/calendar/ical/2da0751953a6122c8f81e7f4840092cac413ef4c5a4070ff395bcf0c3c450b2e%40group.calendar.google.com/public/basic.ics';
   var PROXIES = [
+    'https://corsproxy.io/?url=' + encodeURIComponent(ICAL_URL),
     'https://corsproxy.io/?' + ICAL_URL,
     'https://api.allorigins.win/raw?url=' + encodeURIComponent(ICAL_URL),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(ICAL_URL),
   ];
 
   var widget = document.getElementById('calendar-widget');
@@ -1045,6 +1146,24 @@
     .catch(function() {
       widget.innerHTML = '<p class="cal-empty">Nie udało się załadować kalendarza. Spróbuj odświeżyć stronę.</p>';
     });
+})();
+
+(function() {
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function() {
+    var isOpen = links.classList.toggle('open');
+    btn.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(isOpen));
+  });
+  links.querySelectorAll('a').forEach(function(a) {
+    a.addEventListener('click', function() {
+      links.classList.remove('open');
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  });
 })();
 </script>
 </body>

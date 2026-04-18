@@ -1,5 +1,25 @@
 # Changelog
 
+## [2026-04-18] — Responsywność mobilna + fix kalendarza CORS + favicon
+
+### Nowe funkcje
+- **Hamburger menu** na mobile (≤640px): przycisk z animacją X/☰, rozwijana lista linków na pełną szerokość ekranu; menu zamyka się po kliknięciu linku
+- **Favicon** — ikona kości RPG (`dice_favicon.png`) w zakładce przeglądarki
+
+### Poprawki responsywności (375px / 414px)
+- `section { padding: 70px → 44px }` na mobile
+- `page-wrap { padding: 0 16px }` zamiast 24px na mobile
+- Tabela harmonogramu przelana na karty: każdy wiersz jako oddzielna karta z border-left, kolumna "Opis" ukryta (zbędna na małym ekranie)
+- Tytuł wydarzenia w kalendarzu: `white-space: nowrap` → `normal` na mobile — długie tytuły zawijają się zamiast być obcinane
+
+### Fix kalendarza Google na GitHub Pages
+- Dodano dwa dodatkowe fallbacki CORS proxy:
+  - `corsproxy.io/?url=` (nowy format z encoded URL)
+  - `api.codetabs.com/v1/proxy?quest=` (nowy fallback)
+- Kolejność prób: corsproxy.io (nowy format) → corsproxy.io (stary format) → allorigins.win → codetabs.com
+
+---
+
 ## [2026-04-17] — Favicon + wyśrodkowanie wtyczki Facebook
 
 ### Zmiany
