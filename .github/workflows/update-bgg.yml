@@ -5,6 +5,9 @@ on:
     - cron: '0 4 * * 1'  # Every Monday at 4am UTC
   workflow_dispatch:       # Manual trigger from GitHub UI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -14,21 +17,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch BGG collection (with retry)
+      - name: Login to BGG and fetch collection
+        env:
+          BGG_USERNAME: ${{ secrets.BGG_USERNAME }}
+          BGG_PASSWORD: ${{ secrets.BGG_PASSWORD }}
         run: |
+          COMMON_HEADERS=(
+            -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0"
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            -H "Accept-Language: pl,en-US;q=0.7,en;q=0.3"
+          )
+
+          if [ -n "$BGG_USERNAME" ] && [ -n "$BGG_PASSWORD" ]; then
+            echo "Logging into BGG..."
+            curl -s -c /tmp/bgg_cookies.txt \
+              "${COMMON_HEADERS[@]}" \
+              -X POST \
+              -H "Content-Type: application/json" \
+              -d "{\"credentials\":{\"username\":\"$BGG_USERNAME\",\"password\":\"$BGG_PASSWORD\"}}" \
+              "https://boardgamegeek.com/login/api/v1"
+            AUTH_OPT=(-b /tmp/bgg_cookies.txt)
+            echo "Login done."
+          else
+            echo "No BGG credentials — trying unauthenticated..."
+            AUTH_OPT=()
+          fi
+
           for i in 1 2 3 4 5; do
-            echo "Attempt $i..."
-            curl -s -A "Mozilla/5.0 (compatible; BGGFetcher/1.0)" \
+            echo "Fetching collection, attempt $i..."
+            curl -s "${COMMON_HEADERS[@]}" "${AUTH_OPT[@]}" \
               -o bgg_tmp.xml \
               "https://boardgamegeek.com/xmlapi2/collection?username=Bajomix&stats=1&own=1"
-            if grep -q '<items' bgg_tmp.xml; then
-              echo "Valid response received."
+            head -c 300 bgg_tmp.xml
+            if grep -q '<items' bgg_tmp.xml 2>/dev/null; then
+              echo "Valid response on attempt $i."
               mv bgg_tmp.xml bgg-collection.xml
               break
             fi
-            echo "BGG not ready yet (attempt $i), waiting 15s..."
+            echo "Not ready, waiting 15s..."
             sleep 15
           done
+
           if [ ! -f bgg-collection.xml ]; then
             echo "Failed to fetch BGG collection after 5 attempts."
             exit 1
