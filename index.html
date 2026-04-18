@@ -1253,7 +1253,7 @@
     return cols * 3;
   }
 
-  function renderPagination(currentPage, totalPages) {
+  function renderPagination(totalPages) {
     if (!paginationEl) return;
     if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
     paginationEl.innerHTML =
@@ -1262,8 +1262,13 @@
       '<button class="page-btn" id="page-next"' + (currentPage >= totalPages - 1 ? ' disabled' : '') + '>Następna &#8250;</button>';
     var prev = document.getElementById('page-prev');
     var next = document.getElementById('page-next');
-    if (prev) prev.addEventListener('click', function() { if (currentPage > 0) { currentPage--; applyFilters(); grid.scrollIntoView({behavior: 'smooth', block: 'start'}); } });
-    if (next) next.addEventListener('click', function() { currentPage++; applyFilters(); grid.scrollIntoView({behavior: 'smooth', block: 'start'}); });
+    if (prev) prev.addEventListener('click', function() { if (currentPage > 0) { currentPage--; applyFilters(); scrollToGrid(); } });
+    if (next) next.addEventListener('click', function() { currentPage++; applyFilters(); scrollToGrid(); });
+  }
+
+  function scrollToGrid() {
+    var top = grid.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top: top, behavior: 'smooth' });
   }
 
   function applyFilters() {
@@ -1282,7 +1287,7 @@
     grid.innerHTML = page.length
       ? page.map(renderGame).join('')
       : '<p class="games-empty">Brak gier spełniających kryteria.</p>';
-    renderPagination(currentPage, totalPages);
+    renderPagination(totalPages);
   }
 
   fetch('/bgg-collection.json', { cache: 'no-cache' })
