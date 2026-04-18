@@ -67,46 +67,66 @@ for item in root.findall('item'):
 game_map = {g['id']: g for g in games}
 print(f"Parsed {len(games)} games. Fetching weights...")
 
-# Fetch weights — try api.geekdo.com first, then boardgamegeek.com
-THING_HOSTS = [
-    'https://api.geekdo.com/xmlapi2/thing?stats=1&id=',
-    'https://boardgamegeek.com/xmlapi2/thing?stats=1&id=',
-]
-BATCH = 50
+# Fetch weights
+import requests as req_lib
+
+# Fresh session — no cookies, no auth (thing API is public)
+fresh = req_lib.Session()
+fresh.headers.update({
+    'User-Agent': 'python-requests/2.31.0',
+    'Accept': 'application/xml, text/xml, */*',
+})
+
+def extract_weights(thing_text):
+    tr = ET.fromstring(thing_text)
+    found = 0
+    for item in tr.findall('item'):
+        gid = item.get('id')
+        if gid in game_map:
+            wEl = item.find('.//averageweight')
+            if wEl is not None:
+                try:
+                    game_map[gid]['w'] = round(float(wEl.get('value', 0) or 0), 3)
+                    found += 1
+                except Exception:
+                    pass
+    return found
+
+BATCH = 20
 batches = [ids[i:i+BATCH] for i in range(0, len(ids), BATCH)]
 
 for bi, batch in enumerate(batches):
     batch_ids = ','.join(batch)
     thing_text = None
-    for host in THING_HOSTS:
-        url = host + batch_ids
-        resp = scraper.get(url)
-        host_label = host.split('/')[2]
-        print(f"Thing batch {bi+1}/{len(batches)} [{host_label}]: HTTP {resp.status_code}, preview={resp.text[:80]!r}")
+
+    for label, sess, url in [
+        ('fresh/bgg',        fresh,   f'https://boardgamegeek.com/xmlapi2/thing?stats=1&id={batch_ids}'),
+        ('fresh/geekdo',     fresh,   f'https://api.geekdo.com/xmlapi2/thing?stats=1&id={batch_ids}'),
+        ('cloudscraper/bgg', scraper, f'https://boardgamegeek.com/xmlapi2/thing?stats=1&id={batch_ids}'),
+    ]:
+        resp = sess.get(url)
+        print(f"Thing batch {bi+1}/{len(batches)} [{label}]: HTTP {resp.status_code}, preview={resp.text[:80]!r}")
         if resp.status_code == 200 and '<items' in resp.text:
             thing_text = resp.text
             break
+        if resp.status_code == 202:
+            time.sleep(10)
+            resp = sess.get(url)
+            print(f"  retry: HTTP {resp.status_code}, preview={resp.text[:80]!r}")
+            if resp.status_code == 200 and '<items' in resp.text:
+                thing_text = resp.text
+                break
+
     if thing_text is None:
-        print(f"  All hosts failed for batch {bi+1}")
-        time.sleep(3)
+        print(f"  All methods failed for batch {bi+1}")
+        time.sleep(5)
         continue
     try:
-        tr = ET.fromstring(thing_text)
-        found = 0
-        for item in tr.findall('item'):
-            gid = item.get('id')
-            if gid in game_map:
-                wEl = item.find('.//averageweight')
-                if wEl is not None:
-                    try:
-                        game_map[gid]['w'] = round(float(wEl.get('value', 0) or 0), 3)
-                        found += 1
-                    except Exception:
-                        pass
+        found = extract_weights(thing_text)
         print(f"  weights found: {found}")
     except Exception as e:
         print(f"  Parse error: {e}")
-    time.sleep(3)
+    time.sleep(5)
 
 with open('bgg-collection.json', 'w', encoding='utf-8') as f:
     json.dump(games, f, ensure_ascii=False)
