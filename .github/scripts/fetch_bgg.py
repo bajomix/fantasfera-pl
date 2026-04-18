@@ -1,4 +1,4 @@
-import cloudscraper, json, time, os, xml.etree.ElementTree as ET
+import cloudscraper, json, time, os, re, xml.etree.ElementTree as ET
 
 USERNAME = 'Bajomix'
 BGG_USER = os.environ.get('BGG_USERNAME', '')
@@ -16,6 +16,20 @@ if BGG_USER and BGG_PASS:
         json={"credentials": {"username": BGG_USER, "password": BGG_PASS}}
     )
     print(f"Login status: {r.status_code}")
+
+# Try to extract Bearer token from BGG page (needed for thing API)
+bearer_token = None
+try:
+    page = scraper.get('https://boardgamegeek.com/')
+    match = re.search(r'"(?:accessToken|access_token|token|jwt)"\s*:\s*"(eyJ[A-Za-z0-9._-]+)"', page.text)
+    if match:
+        bearer_token = match.group(1)
+        print(f"Bearer token found (len={len(bearer_token)})")
+        scraper.headers.update({'Authorization': f'Bearer {bearer_token}'})
+    else:
+        print(f"No Bearer token in page. Cookies: {[c.name for c in scraper.cookies]}")
+except Exception as e:
+    print(f"Bearer extraction error: {e}")
 
 # Fetch collection (with retry for BGG 202)
 coll_url = f'https://boardgamegeek.com/xmlapi2/collection?username={USERNAME}&stats=1&own=1'
