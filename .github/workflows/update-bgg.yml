@@ -3,7 +3,7 @@ name: Update BGG Collection
 on:
   schedule:
     - cron: '0 4 * * 1'  # Every Monday at 4am UTC
-  workflow_dispatch:       # Manual trigger from GitHub UI
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -17,55 +17,114 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to BGG and fetch collection
+      - name: Fetch BGG data and build collection JSON
         env:
           BGG_USERNAME: ${{ secrets.BGG_USERNAME }}
           BGG_PASSWORD: ${{ secrets.BGG_PASSWORD }}
         run: |
-          COMMON_HEADERS=(
-            -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0"
-            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-            -H "Accept-Language: pl,en-US;q=0.7,en;q=0.3"
-          )
+          python3 << 'PYEOF'
+          import urllib.request, urllib.error, json, time, os, xml.etree.ElementTree as ET
+          import http.cookiejar
 
-          if [ -n "$BGG_USERNAME" ] && [ -n "$BGG_PASSWORD" ]; then
-            echo "Logging into BGG..."
-            curl -s -c /tmp/bgg_cookies.txt \
-              "${COMMON_HEADERS[@]}" \
-              -X POST \
-              -H "Content-Type: application/json" \
-              -d "{\"credentials\":{\"username\":\"$BGG_USERNAME\",\"password\":\"$BGG_PASSWORD\"}}" \
-              "https://boardgamegeek.com/login/api/v1"
-            AUTH_OPT=(-b /tmp/bgg_cookies.txt)
-            echo "Login done."
-          else
-            echo "No BGG credentials — trying unauthenticated..."
-            AUTH_OPT=()
-          fi
+          USERNAME = 'Bajomix'
+          BGG_USER = os.environ.get('BGG_USERNAME', '')
+          BGG_PASS = os.environ.get('BGG_PASSWORD', '')
 
-          for i in 1 2 3 4 5; do
-            echo "Fetching collection, attempt $i..."
-            curl -s "${COMMON_HEADERS[@]}" "${AUTH_OPT[@]}" \
-              -o bgg_tmp.xml \
-              "https://boardgamegeek.com/xmlapi2/collection?username=Bajomix&stats=1&own=1"
-            head -c 300 bgg_tmp.xml
-            if grep -q '<items' bgg_tmp.xml 2>/dev/null; then
-              echo "Valid response on attempt $i."
-              mv bgg_tmp.xml bgg-collection.xml
-              break
-            fi
-            echo "Not ready, waiting 15s..."
-            sleep 15
-          done
+          cj = http.cookiejar.CookieJar()
+          opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+          opener.addheaders = [
+              ('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0'),
+              ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+          ]
 
-          if [ ! -f bgg-collection.xml ]; then
-            echo "Failed to fetch BGG collection after 5 attempts."
-            exit 1
-          fi
+          def fetch(url, data=None, extra_headers=None):
+              req = urllib.request.Request(url, data=data)
+              if extra_headers:
+                  for k, v in extra_headers.items():
+                      req.add_header(k, v)
+              with opener.open(req, timeout=30) as r:
+                  return r.read().decode('utf-8')
+
+          # Login if credentials available
+          if BGG_USER and BGG_PASS:
+              print("Logging into BGG...")
+              try:
+                  login_data = json.dumps({"credentials": {"username": BGG_USER, "password": BGG_PASS}}).encode()
+                  fetch('https://boardgamegeek.com/login/api/v1', data=login_data,
+                        extra_headers={'Content-Type': 'application/json'})
+                  print("Login OK")
+              except Exception as e:
+                  print(f"Login error: {e}")
+
+          # Fetch collection
+          coll_url = f'https://boardgamegeek.com/xmlapi2/collection?username={USERNAME}&stats=1&own=1'
+          text = None
+          for attempt in range(6):
+              try:
+                  text = fetch(coll_url)
+                  if '<items' in text:
+                      print(f"Collection fetched on attempt {attempt+1}")
+                      break
+                  print(f"BGG not ready (attempt {attempt+1}), response: {text[:100]}")
+              except Exception as e:
+                  print(f"Error attempt {attempt+1}: {e}")
+              time.sleep(15)
+
+          if not text or '<items' not in text:
+              raise SystemExit("Failed to fetch BGG collection")
+
+          # Parse collection
+          root = ET.fromstring(text)
+          games, ids = [], []
+          for item in root.findall('item'):
+              gid = item.get('objectid')
+              ids.append(gid)
+              name_el = item.find('name')
+              thumb_el = item.find('thumbnail')
+              stats_el = item.find('stats')
+              games.append({
+                  'id':    gid,
+                  'name':  (name_el.text or '?').strip() if name_el is not None else '?',
+                  'thumb': (thumb_el.text or '').strip() if thumb_el is not None else '',
+                  'min':   int(stats_el.get('minplayers', 0)) if stats_el is not None else 0,
+                  'max':   int(stats_el.get('maxplayers', 0)) if stats_el is not None else 0,
+                  'minT':  int(stats_el.get('minplaytime', 0)) if stats_el is not None else 0,
+                  'maxT':  int(stats_el.get('maxplaytime', 0)) if stats_el is not None else 0,
+                  'w':     0.0,
+              })
+          game_map = {g['id']: g for g in games}
+          print(f"Parsed {len(games)} games")
+
+          # Fetch weights from thing API in batches of 50
+          BATCH = 50
+          for i in range(0, len(ids), BATCH):
+              batch = ids[i:i+BATCH]
+              thing_url = 'https://boardgamegeek.com/xmlapi2/thing?stats=1&id=' + ','.join(batch)
+              try:
+                  thing_text = fetch(thing_url)
+                  thing_root = ET.fromstring(thing_text)
+                  for item in thing_root.findall('item'):
+                      gid = item.get('id')
+                      if gid in game_map:
+                          wEl = item.find('.//averageweight')
+                          if wEl is not None:
+                              try:
+                                  game_map[gid]['w'] = round(float(wEl.get('value', 0) or 0), 3)
+                              except Exception:
+                                  pass
+                  print(f"Thing batch {i//BATCH+1}/{(len(ids)+BATCH-1)//BATCH} OK")
+              except Exception as e:
+                  print(f"Thing batch {i//BATCH+1} error: {e}")
+              time.sleep(2)
+
+          with open('bgg-collection.json', 'w', encoding='utf-8') as f:
+              json.dump(games, f, ensure_ascii=False)
+          print(f"Saved {len(games)} games to bgg-collection.json")
+          PYEOF
 
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bgg-collection.xml
+          git add bgg-collection.json
           git diff --staged --quiet || (git commit -m "Update BGG collection data [skip ci]" && git push)

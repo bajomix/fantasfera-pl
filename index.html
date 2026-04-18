@@ -1009,12 +1009,12 @@
     <div class="games-controls">
       <input type="search" class="games-search" placeholder="Szukaj gry po tytule…" autocomplete="off">
       <div class="filter-row">
-        <button class="filter-btn active" data-players="all">Wszyscy</button>
-        <button class="filter-btn" data-players="2">2 graczy</button>
-        <button class="filter-btn" data-players="3">3 graczy</button>
-        <button class="filter-btn" data-players="4">4 graczy</button>
-        <button class="filter-btn" data-players="5">5 graczy</button>
-        <button class="filter-btn" data-players="6">6+ graczy</button>
+        <button class="filter-btn active" data-diff="all">Wszystkie</button>
+        <button class="filter-btn" data-diff="beginner">Początkujący</button>
+        <button class="filter-btn" data-diff="easy">Łatwy</button>
+        <button class="filter-btn" data-diff="medium">Średni</button>
+        <button class="filter-btn" data-diff="hard">Zaawansowany</button>
+        <button class="filter-btn" data-diff="expert">Ekspercki</button>
       </div>
     </div>
 
@@ -1180,69 +1180,27 @@
 /* === BGG GAMES CATALOG === */
 (function() {
   'use strict';
-  var BGG_URL = 'https://boardgamegeek.com/xmlapi2/collection?username=Bajomix&stats=1&own=1';
-  var PROXIES = [
-    function(u) { return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
-    function(u) { return 'https://corsproxy.io/?' + u; },
-    function(u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
-    function(u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); },
-  ];
-  var allGames = [], searchQuery = '', playerFilter = 'all';
+  var allGames = [], searchQuery = '', diffFilter = 'all';
   var grid = document.getElementById('games-grid');
 
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function fetchProxy(url, pi, retries) {
-    pi = pi || 0; retries = retries || 0;
-    if (pi >= PROXIES.length) return Promise.reject(new Error('all proxies failed'));
-    return fetch(PROXIES[pi](url), { cache: 'no-cache' })
-      .then(function(r) { return r.text(); })
-      .then(function(text) {
-        if (text && text.indexOf('accepted and will be processed') > -1) {
-          if (retries < 4) return new Promise(function(res) {
-            setTimeout(function() { res(fetchProxy(url, pi, retries + 1)); }, 3000);
-          });
-          throw new Error('BGG timeout');
-        }
-        return text;
-      })
-      .catch(function() { return fetchProxy(url, pi + 1, 0); });
-  }
-
-  function parseGames(xml) {
-    var doc = new DOMParser().parseFromString(xml, 'application/xml');
-    var out = [];
-    doc.querySelectorAll('item').forEach(function(item) {
-      var nameEl = item.querySelector('name');
-      var thumbEl = item.querySelector('thumbnail');
-      var stats = item.querySelector('stats');
-      var wEl = item.querySelector('averageweight');
-      var w = wEl ? (+wEl.getAttribute('value') || +wEl.textContent || 0) : 0;
-      out.push({
-        id:   item.getAttribute('objectid'),
-        name: nameEl ? nameEl.textContent.trim() : '?',
-        thumb: thumbEl ? thumbEl.textContent.trim() : '',
-        min:  stats ? (+stats.getAttribute('minplayers') || 0) : 0,
-        max:  stats ? (+stats.getAttribute('maxplayers') || 0) : 0,
-        minT: stats ? (+stats.getAttribute('minplaytime') || 0) : 0,
-        maxT: stats ? (+stats.getAttribute('maxplaytime') || 0) : 0,
-        w:    w,
-      });
-    });
-    return out;
+  function getDiffKey(w) {
+    if (!w || w <= 0) return 'none';
+    if (w < 2.3)  return 'beginner';
+    if (w < 3.0)  return 'easy';
+    if (w < 3.6)  return 'medium';
+    if (w <= 4.1) return 'hard';
+    return 'expert';
   }
 
   function diffBadge(w) {
-    if (!w || w <= 0) return '';
-    var l, c;
-    if      (w < 2.3)  { l = 'Początkujący'; c = 'diff-beginner'; }
-    else if (w < 3.0)  { l = 'Łatwy';        c = 'diff-easy';     }
-    else if (w < 3.6)  { l = 'Średni';        c = 'diff-medium';   }
-    else if (w <= 4.1) { l = 'Zaawansowany';  c = 'diff-hard';     }
-    else               { l = 'Ekspercki';      c = 'diff-expert';   }
-    return '<span class="diff-badge ' + c + '">' + l + '</span>';
+    var key = getDiffKey(w);
+    if (key === 'none') return '';
+    var labels = { beginner: 'Początkujący', easy: 'Łatwy', medium: 'Średni', hard: 'Zaawansowany', expert: 'Ekspercki' };
+    return '<span class="diff-badge diff-' + key + '">' + labels[key] + '</span>';
   }
 
   function renderGame(g) {
@@ -1270,10 +1228,7 @@
     var q = searchQuery.toLowerCase();
     var filtered = allGames.filter(function(g) {
       if (q && g.name.toLowerCase().indexOf(q) < 0) return false;
-      if (playerFilter !== 'all') {
-        var p = +playerFilter;
-        return p >= 6 ? g.max >= 6 : (g.min <= p && g.max >= p);
-      }
+      if (diffFilter !== 'all' && getDiffKey(g.w) !== diffFilter) return false;
       return true;
     });
     grid.innerHTML = filtered.length
@@ -1281,28 +1236,15 @@
       : '<p class="games-empty">Brak gier spełniających kryteria.</p>';
   }
 
-  function loadGames() {
-    return fetch('/bgg-collection.xml', { cache: 'no-cache' })
-      .then(function(r) {
-        if (!r.ok) throw new Error('no local cache');
-        return r.text();
-      })
-      .then(function(text) {
-        if (!text || text.indexOf('<items') < 0) throw new Error('invalid local cache');
-        return text;
-      })
-      .catch(function() { return fetchProxy(BGG_URL); });
-  }
-
-  loadGames()
-    .then(function(text) {
-      if (!text || text.indexOf('<items') < 0) throw new Error('invalid');
-      allGames = parseGames(text).sort(function(a, b) { return a.name.localeCompare(b.name); });
+  fetch('/bgg-collection.json', { cache: 'no-cache' })
+    .then(function(r) { if (!r.ok) throw new Error('no file'); return r.json(); })
+    .then(function(data) {
+      allGames = data.sort(function(a, b) { return a.name.localeCompare(b.name); });
       if (!allGames.length) { grid.innerHTML = '<p class="games-empty">Kolekcja jest pusta.</p>'; return; }
       applyFilters();
     })
     .catch(function() {
-      if (grid) grid.innerHTML = '<p class="games-empty">Nie udało się załadować kolekcji. Spróbuj odświeżyć stronę.</p>';
+      if (grid) grid.innerHTML = '<p class="games-empty">Nie udało się załadować kolekcji. Odpal workflow na GitHub Actions.</p>';
     });
 
   var si = document.querySelector('.games-search');
@@ -1312,7 +1254,7 @@
     btn.addEventListener('click', function() {
       document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
-      playerFilter = this.dataset.players;
+      diffFilter = this.dataset.diff;
       applyFilters();
     });
   });

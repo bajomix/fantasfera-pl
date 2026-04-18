@@ -1,5 +1,15 @@
 # Changelog
 
+## [2026-04-18] — Katalog gier: filtry trudności + badge'y + JSON z weight
+
+### Zmiany
+- Filtry zmienione z "liczba graczy" na "trudność" (Wszystkie / Początkujący / Łatwy / Średni / Zaawansowany / Ekspercki)
+- Frontend czyta `bgg-collection.json` zamiast XML — JSON zawiera pole `w` (averageweight z BGG thing API)
+- Badge'y trudności działają poprawnie — `averageweight` nie było dostępne w collection API, teraz pobierane osobno z thing API przez GitHub Action
+- GitHub Action zaktualizowany: po pobraniu kolekcji fetchuje thing API partiami po 50 gier i zapisuje `bgg-collection.json` z pełnymi danymi
+
+---
+
 ## [2026-04-18] — Katalog gier BGG + GitHub Action do synchronizacji
 
 ### Nowe funkcje
