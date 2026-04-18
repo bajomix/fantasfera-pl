@@ -80,15 +80,29 @@ jobs:
           print(f"Parsed {len(games)} games. Fetching weights...")
 
           # Fetch weights from thing API in batches of 50
+          # Try api.geekdo.com (internal BGG domain) as fallback to boardgamegeek.com
+          THING_HOSTS = [
+              'https://api.geekdo.com/xmlapi2/thing?stats=1&id=',
+              'https://boardgamegeek.com/xmlapi2/thing?stats=1&id=',
+          ]
           BATCH = 50
           batches = [ids[i:i+BATCH] for i in range(0, len(ids), BATCH)]
           for bi, batch in enumerate(batches):
-              url = 'https://boardgamegeek.com/xmlapi2/thing?stats=1&id=' + ','.join(batch)
-              r = scraper.get(url)
-              print(f"Thing batch {bi+1}/{len(batches)}: HTTP {r.status_code}, preview={r.text[:80]!r}")
-              if r.status_code == 200 and '<items' in r.text:
-                  try:
-                      tr = ET.fromstring(r.text)
+              batch_ids = ','.join(batch)
+              r = None
+              for host in THING_HOSTS:
+                  url = host + batch_ids
+                  resp = scraper.get(url)
+                  print(f"Thing batch {bi+1}/{len(batches)} [{host.split('/')[2]}]: HTTP {resp.status_code}, preview={resp.text[:80]!r}")
+                  if resp.status_code == 200 and '<items' in resp.text:
+                      r = resp
+                      break
+              if r is None:
+                  print(f"  All hosts failed for batch {bi+1}")
+                  time.sleep(3)
+                  continue
+              try:
+                  tr = ET.fromstring(r.text)
                       found = 0
                       for item in tr.findall('item'):
                           gid = item.get('id')
@@ -103,8 +117,6 @@ jobs:
                       print(f"  → weights found: {found}")
                   except Exception as e:
                       print(f"  Parse error: {e}")
-              else:
-                  print(f"  Skipping batch (non-200 or no data)")
               time.sleep(3)
 
           with open('bgg-collection.json', 'w', encoding='utf-8') as f:
