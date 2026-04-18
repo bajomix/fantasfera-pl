@@ -570,6 +570,27 @@
     font-style: italic;
     padding: 60px 20px;
   }
+  #games-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .page-btn {
+    background: rgba(232,168,32,0.08);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold-light);
+    padding: 8px 20px;
+    font-family: var(--font-text);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .page-btn:hover:not(:disabled) { background: rgba(232,168,32,0.2); border-color: var(--gold); }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-info { color: var(--text-muted); font-size: 13px; min-width: 60px; text-align: center; }
   @media (max-width: 640px) {
     #games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
     .filter-btn { font-size: 10px; padding: 6px 10px; }
@@ -1021,6 +1042,7 @@
     <div id="games-grid">
       <p class="games-loading">Ładowanie kolekcji…</p>
     </div>
+    <div id="games-pagination"></div>
   </div>
 </section>
 
@@ -1180,8 +1202,10 @@
 /* === BGG GAMES CATALOG === */
 (function() {
   'use strict';
-  var allGames = [], searchQuery = '', diffFilter = 'all';
+  var allGames = [], searchQuery = '', diffFilter = 'all', currentPage = 0;
   var grid = document.getElementById('games-grid');
+  var paginationEl = document.getElementById('games-pagination');
+  var ITEM_MIN_W = 175; // matches CSS minmax
 
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1223,6 +1247,25 @@
     '</a>';
   }
 
+  function getPageSize() {
+    if (!grid) return 12;
+    var cols = Math.max(1, Math.floor(grid.offsetWidth / ITEM_MIN_W));
+    return cols * 3;
+  }
+
+  function renderPagination(currentPage, totalPages) {
+    if (!paginationEl) return;
+    if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
+    paginationEl.innerHTML =
+      '<button class="page-btn" id="page-prev"' + (currentPage === 0 ? ' disabled' : '') + '>&#8249; Poprzednia</button>' +
+      '<span class="page-info">' + (currentPage + 1) + ' / ' + totalPages + '</span>' +
+      '<button class="page-btn" id="page-next"' + (currentPage >= totalPages - 1 ? ' disabled' : '') + '>Następna &#8250;</button>';
+    var prev = document.getElementById('page-prev');
+    var next = document.getElementById('page-next');
+    if (prev) prev.addEventListener('click', function() { if (currentPage > 0) { currentPage--; applyFilters(); grid.scrollIntoView({behavior: 'smooth', block: 'start'}); } });
+    if (next) next.addEventListener('click', function() { currentPage++; applyFilters(); grid.scrollIntoView({behavior: 'smooth', block: 'start'}); });
+  }
+
   function applyFilters() {
     if (!grid) return;
     var q = searchQuery.toLowerCase();
@@ -1231,9 +1274,15 @@
       if (diffFilter !== 'all' && getDiffKey(g.w) !== diffFilter) return false;
       return true;
     });
-    grid.innerHTML = filtered.length
-      ? filtered.map(renderGame).join('')
+    var pageSize = getPageSize();
+    var totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (currentPage >= totalPages) currentPage = 0;
+    var start = currentPage * pageSize;
+    var page = filtered.slice(start, start + pageSize);
+    grid.innerHTML = page.length
+      ? page.map(renderGame).join('')
       : '<p class="games-empty">Brak gier spełniających kryteria.</p>';
+    renderPagination(currentPage, totalPages);
   }
 
   fetch('/bgg-collection.json', { cache: 'no-cache' })
@@ -1248,13 +1297,14 @@
     });
 
   var si = document.querySelector('.games-search');
-  if (si) si.addEventListener('input', function() { searchQuery = this.value; applyFilters(); });
+  if (si) si.addEventListener('input', function() { searchQuery = this.value; currentPage = 0; applyFilters(); });
 
   document.querySelectorAll('.filter-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
       diffFilter = this.dataset.diff;
+      currentPage = 0;
       applyFilters();
     });
   });
