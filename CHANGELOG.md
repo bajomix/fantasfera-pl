@@ -1,5 +1,18 @@
 # Changelog
 
+## [2026-04-18] — Skrypt do scalania kolekcji znajomego z BGG CSV
+
+### Nowe funkcje
+- `merge_guest_collection.py` — dodaje gry z pliku CSV eksportowanego przez znajomego z BGG
+  - Deduplikacja po `objectid` — pomija gry już istniejące w kolekcji
+  - Pobiera miniaturki z BGG thing API (bez statystyk — brak 401)
+  - Merguje wagi do `weights.json`
+  - Sortuje kolekcję alfabetycznie i zapisuje oba pliki
+  - Użycie: `python3 merge_guest_collection.py <friend.csv>`
+- `fetch_weights_local.py` przepisany — teraz ekstrakcja wag z CSV zamiast Playwright (BGG API zablokowane)
+
+---
+
 ## [2026-04-19] — Progi trudności gier zaktualizowane
 
 ### Zmiany
