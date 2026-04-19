@@ -1,5 +1,14 @@
 # Changelog
 
+## [2026-04-19] — weights.json: wagi z eksportu CSV kolekcji BGG
+
+### Zmiany
+- Wagi pobrane z eksportu CSV kolekcji BGG (kolumna `avgweight`) — 71 gier
+- `weights.json` commitowany do repo; CI merguje wagi przy każdym updacie kolekcji
+- Przy nowych grach: wyeksportuj kolekcję z BGG → nadpisz `weights.json` → push
+
+---
+
 ## [2026-04-19] — BGG weight fetch: lokalny skrypt + weights.json
 
 ### Zmiany
