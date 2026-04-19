@@ -17,7 +17,7 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 | **Hero** | Logo, hasło, wstęp |
 | **O nas** | Opis grupy, karty informacyjne (Gdzie / Rodzaj gier / Nowi gracze / Spotkania) |
 | **Harmonogram** | Tabela cyklicznych spotkań + widget kalendarza Google + widget Aftergame + Facebook Page Plugin |
-| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); filtrowanie po trudności; wyszukiwarka; paginacja (3 wiersze / strona) |
+| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); filtrowanie po trudności; wyszukiwarka; paginacja (8 gier / strona) |
 | **Znajdź nas w sieci** | Linki do Aftergame, Facebooka, Instagrama, Discorda |
 
 ---
@@ -57,9 +57,12 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 ├── Instagram_Glyph_Gradient.png    # Ikona Instagram (gradient)
 ├── Discord-Symbol-Blurple.png      # Ikona Discord
 ├── dice_favicon.png                # Favicon
+├── weights.json                    # Wagi trudności gier ({id: weight}), commitowane ręcznie
+├── fetch_weights_local.py          # Skrypt: ekstrakcja wag z CSV eksportu BGG
+├── merge_guest_collection.py       # Skrypt: scalanie kolekcji znajomego z CSV
 ├── .github/
 │   ├── workflows/update-bgg.yml    # GitHub Action: cotygodniowa sync kolekcji BGG
-│   └── scripts/fetch_bgg.py        # Skrypt Python: pobiera kolekcję + wagi z BGG API
+│   └── scripts/fetch_bgg.py        # Skrypt Python: pobiera kolekcję + merguje wagi
 ├── README.md
 └── CHANGELOG.md
 ```
@@ -76,11 +79,34 @@ Strona jest automatycznie publikowana przez GitHub Pages przy każdym pushu na g
 
 Dane kolekcji pobierane są przez GitHub Action (`.github/workflows/update-bgg.yml`):
 - Uruchamiany co poniedziałek o 4:00 UTC + ręczny trigger
-- Skrypt `fetch_bgg.py` loguje się do BGG, pobiera kolekcję użytkownika `Bajomix` przez XML API v2, następnie pobiera wagi złożoności (`averageweight`) przez wewnętrzne JSON API BGG (`api.geekdo.com/api/geekitems`)
+- Skrypt `fetch_bgg.py` loguje się do BGG, pobiera kolekcję użytkownika `Bajomix` przez XML API v2, merguje wagi z `weights.json`
 - Wynik zapisywany jako `bgg-collection.json` i commitowany do repo
 - Frontend czyta `/bgg-collection.json` (same-origin, zero CORS)
 
-> **Uwaga:** BGG XML API (v1 i v2) zwraca 401 dla IP datacenter (GitHub Actions = Azure). Wagi pobierane są przez wewnętrzne API geekitems które działa bez auth.
+> **Uwaga:** BGG XML API zwraca 401 dla wszystkich metod z IP datacenter. Wagi (`averageweight`) pobierane są raz lokalnie z eksportu CSV kolekcji BGG i commitowane jako `weights.json`.
+
+### Aktualizacja wag trudności
+
+1. Wejdź na BGG → Kolekcja → Eksportuj jako CSV
+2. Uruchom: `python3 fetch_weights_local.py collection.csv`
+3. `git add weights.json && git commit -m "Update weights" && git push`
+
+### Dodanie kolekcji znajomego
+
+1. Poproś znajomego o eksport CSV z BGG (Kolekcja → Eksportuj jako CSV)
+2. Uruchom: `python3 merge_guest_collection.py kolekcja_znajomego.csv`
+3. Skrypt pominie gry już istniejące w Twojej kolekcji (deduplicacja po ID)
+4. `git add bgg-collection.json weights.json && git commit -m "Add friend collection" && git push`
+
+### Progi trudności (badge'y)
+
+| Badge | Zakres averageweight |
+|---|---|
+| Początkujący | < 2.0 |
+| Łatwy | < 3.0 |
+| Średniozaaw. | < 3.6 |
+| Zaawansowany | < 4.2 |
+| Ekspercki | ≥ 4.2 |
 
 ---
 
