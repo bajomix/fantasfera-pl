@@ -17,13 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Python dependencies
-        run: pip install cloudscraper requests playwright
+      - name: Install dependencies
+        run: pip install cloudscraper requests
 
-      - name: Install Playwright browsers
-        run: playwright install chromium --with-deps
-
-      - name: Fetch BGG data and build collection JSON
+      - name: Fetch BGG collection and merge weights
         env:
           BGG_USERNAME: ${{ secrets.BGG_USERNAME }}
           BGG_PASSWORD: ${{ secrets.BGG_PASSWORD }}

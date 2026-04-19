@@ -1,5 +1,15 @@
 # Changelog
 
+## [2026-04-19] — BGG weight fetch: lokalny skrypt + weights.json
+
+### Zmiany
+- Porzucono próby fetchowania wag w CI (BGG blokuje thing API ze wszystkich IP datacenter niezależnie od metody)
+- Dodano `fetch_weights_local.py` — skrypt do uruchomienia raz lokalnie, generuje `weights.json` z mapą `{id: weight}`
+- CI script uproszczony: pobiera tylko kolekcję, merguje wagi z `weights.json` (jeśli istnieje)
+- Usunięto Playwright z workflow — czas buildu z ~2min do ~15s
+
+---
+
 ## [2026-04-19] — Paginacja: stały limit 8 gier na stronę
 
 ### Zmiany
