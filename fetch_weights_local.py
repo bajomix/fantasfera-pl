@@ -33,7 +33,19 @@ session.headers.update({
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
                   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'Accept': 'application/xml, text/xml, */*',
+    'Referer': 'https://boardgamegeek.com/',
 })
+
+bgg_user = input("BGG username (Enter to skip login): ").strip()
+bgg_pass = input("BGG password (Enter to skip login): ").strip() if bgg_user else ''
+
+if bgg_user and bgg_pass:
+    r = session.post(
+        'https://boardgamegeek.com/login/api/v1',
+        json={"credentials": {"username": bgg_user, "password": bgg_pass}}
+    )
+    print(f"Login: HTTP {r.status_code} {'OK' if r.status_code == 204 else 'FAILED'}")
+    print(f"Cookies: {[c.name for c in session.cookies]}")
 
 BATCH = 20
 batches = [ids[i:i+BATCH] for i in range(0, len(ids), BATCH)]
