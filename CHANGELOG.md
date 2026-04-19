@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-04-19] — BGG weight fetch: in-browser fetch() via Playwright
+
+### Zmiany
+- Bearer token nie istnieje w BGG (używa cookie-based auth) — nowe podejście: `page.evaluate()` wywołuje `fetch()` bezpośrednio z wnętrza przeglądarki Chromium, z cookies i nagłówkami `sec-fetch-*`; BGG traktuje to jako prawdziwy request przeglądarki
+
+---
+
 ## [2026-04-18] — BGG weight fetch: Playwright (headless Chrome)
 
 ### Zmiany
