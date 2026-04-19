@@ -1248,9 +1248,7 @@
   }
 
   function getPageSize() {
-    if (!grid) return 12;
-    var cols = Math.max(1, Math.floor(grid.offsetWidth / ITEM_MIN_W));
-    return cols * 3;
+    return 8;
   }
 
   function renderPagination(totalPages) {

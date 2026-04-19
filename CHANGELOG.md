@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-04-19] — Paginacja: stały limit 8 gier na stronę
+
+### Zmiany
+- Zmieniono rozmiar strony z dynamicznego (cols × 3) na stały: 8 gier
+
+---
+
 ## [2026-04-19] — BGG weight fetch: in-browser fetch() via Playwright
 
 ### Zmiany
