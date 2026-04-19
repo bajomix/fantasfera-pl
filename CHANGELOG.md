@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-04-19] — Progi trudności gier zaktualizowane
+
+### Zmiany
+- Nowe progi: Początkujący <2.0 / Łatwy <3.0 / Średniozaaw. <3.6 / Zaawansowany <4.2 / Ekspercki ≥4.2
+- Etykieta "Średni" → "Średniozaaw." (badge + filtr)
+
+---
+
 ## [2026-04-19] — weights.json: wagi z eksportu CSV kolekcji BGG
 
 ### Zmiany

@@ -1033,7 +1033,7 @@
         <button class="filter-btn active" data-diff="all">Wszystkie</button>
         <button class="filter-btn" data-diff="beginner">Początkujący</button>
         <button class="filter-btn" data-diff="easy">Łatwy</button>
-        <button class="filter-btn" data-diff="medium">Średni</button>
+        <button class="filter-btn" data-diff="medium">Średniozaaw.</button>
         <button class="filter-btn" data-diff="hard">Zaawansowany</button>
         <button class="filter-btn" data-diff="expert">Ekspercki</button>
       </div>
@@ -1213,17 +1213,17 @@
 
   function getDiffKey(w) {
     if (!w || w <= 0) return 'none';
-    if (w < 2.3)  return 'beginner';
+    if (w < 2.0)  return 'beginner';
     if (w < 3.0)  return 'easy';
     if (w < 3.6)  return 'medium';
-    if (w <= 4.1) return 'hard';
+    if (w < 4.2)  return 'hard';
     return 'expert';
   }
 
   function diffBadge(w) {
     var key = getDiffKey(w);
     if (key === 'none') return '';
-    var labels = { beginner: 'Początkujący', easy: 'Łatwy', medium: 'Średni', hard: 'Zaawansowany', expert: 'Ekspercki' };
+    var labels = { beginner: 'Początkujący', easy: 'Łatwy', medium: 'Średniozaaw.', hard: 'Zaawansowany', expert: 'Ekspercki' };
     return '<span class="diff-badge diff-' + key + '">' + labels[key] + '</span>';
   }
 
