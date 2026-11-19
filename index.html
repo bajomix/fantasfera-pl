@@ -512,9 +512,14 @@
 
   #games-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 18px;
   }
+  @media (max-width: 960px) { #games-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { #games-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
+  @media (max-width: 440px) { #games-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .page-size-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .page-size-label { font-size: 12px; color: var(--text-muted); margin-right: 2px; }
   .game-card {
     display: flex;
     flex-direction: column;
@@ -611,7 +616,6 @@
   .games-credit a:hover { color: var(--gold-light); border-color: var(--gold-light); }
   .page-info { color: var(--text-muted); font-size: 13px; min-width: 60px; text-align: center; }
   @media (max-width: 640px) {
-    #games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
     .filter-btn { font-size: 10px; padding: 6px 10px; }
   }
 
@@ -1056,6 +1060,12 @@
         <button class="filter-btn" data-diff="hard">Zaawansowany</button>
         <button class="filter-btn" data-diff="expert">Ekspercki</button>
       </div>
+      <div class="page-size-row">
+        <span class="page-size-label">Gier na stronie:</span>
+        <button class="filter-btn size-btn active" data-size="12">12</button>
+        <button class="filter-btn size-btn" data-size="24">24</button>
+        <button class="filter-btn size-btn" data-size="48">48</button>
+      </div>
     </div>
 
     <div id="games-grid">
@@ -1225,7 +1235,12 @@
   var allGames = [], searchQuery = '', diffFilter = 'all', currentPage = 0;
   var grid = document.getElementById('games-grid');
   var paginationEl = document.getElementById('games-pagination');
-  var ITEM_MIN_W = 175; // matches CSS minmax
+  var PAGE_SIZES = [12, 24, 48];
+  var pageSize = 12;
+  try {
+    var saved = parseInt(localStorage.getItem('fantasfera-page-size'), 10);
+    if (PAGE_SIZES.indexOf(saved) >= 0) pageSize = saved;
+  } catch (e) {}
 
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1269,10 +1284,6 @@
     '</a>';
   }
 
-  function getPageSize() {
-    return 8;
-  }
-
   function renderPagination(totalPages) {
     if (!paginationEl) return;
     if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
@@ -1299,7 +1310,6 @@
       if (diffFilter !== 'all' && getDiffKey(g.w) !== diffFilter) return false;
       return true;
     });
-    var pageSize = getPageSize();
     var totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
     if (currentPage >= totalPages) currentPage = 0;
     var start = currentPage * pageSize;
@@ -1324,9 +1334,24 @@
   var si = document.querySelector('.games-search');
   if (si) si.addEventListener('input', function() { searchQuery = this.value; currentPage = 0; applyFilters(); });
 
-  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+  var sizeBtns = document.querySelectorAll('.size-btn');
+  sizeBtns.forEach(function(btn) {
+    btn.classList.toggle('active', parseInt(btn.dataset.size, 10) === pageSize);
     btn.addEventListener('click', function() {
-      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      var newSize = parseInt(this.dataset.size, 10);
+      if (newSize === pageSize) return;
+      sizeBtns.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      currentPage = Math.floor(currentPage * pageSize / newSize); // keep first visible game on screen
+      pageSize = newSize;
+      try { localStorage.setItem('fantasfera-page-size', String(pageSize)); } catch (e) {}
+      applyFilters();
+    });
+  });
+
+  document.querySelectorAll('.filter-btn[data-diff]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn[data-diff]').forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
       diffFilter = this.dataset.diff;
       currentPage = 0;

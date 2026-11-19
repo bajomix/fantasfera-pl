@@ -3,6 +3,8 @@
 ## [2026-11-19] — Badge „Dodatek”, wagi, token BGG
 
 ### Zmiany
+- Wybór liczby gier na stronie: 12 (domyślnie) / 24 / 48, zapamiętywany w localStorage
+- Stała liczba kolumn siatki (6 / 4 / 3 / 2 zależnie od szerokości), więc rzędy są zawsze pełne
 - Badge „Dodatek” na okładkach rozszerzeń (pole `exp` w `bgg-collection.json`); link prowadzi do `/boardgameexpansion/<id>`
 - `fetch_bgg.py`: osobne zapytanie o dodatki, obsługa tokena aplikacji (`BGG_API_TOKEN`), ponawianie logowania
 - `merge_guest_collection.py`: oznacza dodatki na podstawie kolumny `itemtype` z CSV

@@ -17,7 +17,7 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 | **Hero** | Logo, hasło, wstęp |
 | **O nas** | Opis grupy, karty informacyjne (Gdzie / Rodzaj gier / Nowi gracze / Spotkania) |
 | **Harmonogram** | Tabela cyklicznych spotkań + widget kalendarza Google + widget Aftergame + Facebook Page Plugin |
-| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); badge „Dodatek” dla rozszerzeń; filtrowanie po trudności; wyszukiwarka; paginacja (8 gier / strona) |
+| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); badge „Dodatek” dla rozszerzeń; filtrowanie po trudności; wyszukiwarka; paginacja (12 / 24 / 48 gier na stronę, wybór zapamiętywany w przeglądarce) |
 | **Znajdź nas w sieci** | Linki do Aftergame, Facebooka, Instagrama, Discorda |
 
 ---
