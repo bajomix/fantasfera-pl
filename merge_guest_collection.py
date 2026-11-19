@@ -59,6 +59,8 @@ with open(CSV_FILE, encoding='utf-8', errors='replace') as f:
             'w':    w,
             'thumb': '',
         })
+        if (row.get('itemtype') or '').strip() == 'expansion':
+            new_games[-1]['exp'] = True
 
 print(f"Friend's CSV: {len(new_games)} new games, {skipped} already in your collection")
 

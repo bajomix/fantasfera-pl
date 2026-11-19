@@ -17,7 +17,7 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 | **Hero** | Logo, hasło, wstęp |
 | **O nas** | Opis grupy, karty informacyjne (Gdzie / Rodzaj gier / Nowi gracze / Spotkania) |
 | **Harmonogram** | Tabela cyklicznych spotkań + widget kalendarza Google + widget Aftergame + Facebook Page Plugin |
-| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); filtrowanie po trudności; wyszukiwarka; paginacja (8 gier / strona) |
+| **Katalog Gier** | Grid okładek z kolekcji BGG; badge trudności (averageweight); badge „Dodatek” dla rozszerzeń; filtrowanie po trudności; wyszukiwarka; paginacja (8 gier / strona) |
 | **Znajdź nas w sieci** | Linki do Aftergame, Facebooka, Instagrama, Discorda |
 
 ---
@@ -80,6 +80,7 @@ Strona jest automatycznie publikowana przez GitHub Pages przy każdym pushu na g
 Dane kolekcji pobierane są przez GitHub Action (`.github/workflows/update-bgg.yml`):
 - Uruchamiany co poniedziałek o 4:00 UTC + ręczny trigger
 - Skrypt `fetch_bgg.py` loguje się do BGG, pobiera kolekcję użytkownika `Bajomix` przez XML API v2, merguje wagi z `weights.json`
+- Dodatki oznaczane są polem `exp: true` — XML kolekcji oznacza je jako zwykłe gry, więc ich ID pobierane są osobnym zapytaniem (`subtype=boardgameexpansion`); przy błędzie skrypt zachowuje poprzednie oznaczenia
 - Wynik zapisywany jako `bgg-collection.json` i commitowany do repo
 - Frontend czyta `/bgg-collection.json` (same-origin, zero CORS)
 

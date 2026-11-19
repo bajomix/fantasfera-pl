@@ -60,6 +60,31 @@ for item in root.findall('item'):
 
 print(f"Parsed {len(games)} games.")
 
+# The collection XML marks expansions as subtype="boardgame", so fetch the
+# expansion IDs with a separate request. If that fails, keep the flags from
+# the previous bgg-collection.json (also set from CSV by the local scripts).
+exp_ids = None
+exp_url = f'https://boardgamegeek.com/xmlapi2/collection?username={USERNAME}&own=1&subtype=boardgameexpansion'
+for attempt in range(4):
+    r = scraper.get(exp_url)
+    print(f"Expansions attempt {attempt+1}: HTTP {r.status_code}")
+    if r.status_code == 200 and '<items' in r.text:
+        exp_ids = {it.get('objectid') for it in ET.fromstring(r.text).findall('item')}
+        break
+    time.sleep(10)
+
+if exp_ids is None:
+    exp_ids = set()
+    if os.path.exists('bgg-collection.json'):
+        with open('bgg-collection.json', encoding='utf-8') as f:
+            exp_ids = {g['id'] for g in json.load(f) if g.get('exp')}
+    print(f"Expansion fetch failed, reusing {len(exp_ids)} flags from previous data.")
+
+for g in games:
+    if g['id'] in exp_ids:
+        g['exp'] = True
+print(f"Marked {sum(1 for g in games if g.get('exp'))} expansions.")
+
 # Merge weights from weights.json (maintained locally via fetch_weights_local.py)
 weights_file = 'weights.json'
 if os.path.exists(weights_file):

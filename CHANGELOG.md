@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-11-19] — Badge „Dodatek”, wagi, token BGG
+
+### Zmiany
+- Badge „Dodatek” na okładkach rozszerzeń (pole `exp` w `bgg-collection.json`); link prowadzi do `/boardgameexpansion/<id>`
+- `fetch_bgg.py`: osobne zapytanie o dodatki, obsługa tokena aplikacji (`BGG_API_TOKEN`), ponawianie logowania
+- `merge_guest_collection.py`: oznacza dodatki na podstawie kolumny `itemtype` z CSV
+- Wagi trudności uzupełnione z eksportu CSV (85/88 gier)
+- Dopisek „Dane o grach: BoardGameGeek” pod katalogiem (wymóg regulaminu API)
+
+---
+
 ## [2026-04-18] — Skrypt do scalania kolekcji znajomego z BGG CSV
 
 ### Nowe funkcje

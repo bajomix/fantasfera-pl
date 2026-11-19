@@ -554,6 +554,22 @@
   .diff-medium   { background: rgba(195,85,0,0.92);   color: #ffe4c0; }
   .diff-hard     { background: rgba(170,30,30,0.92);  color: #ffd0d0; }
   .diff-expert   { background: rgba(90,0,110,0.92);   color: #f0d0ff; }
+  .exp-badge {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    padding: 3px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: rgba(20,14,8,0.88);
+    color: var(--gold-light);
+    border: 1px solid var(--gold-dim);
+  }
   .game-info { padding: 11px 12px 14px; display: flex; flex-direction: column; gap: 5px; }
   .game-title {
     font-family: 'Cinzel', serif;
@@ -1236,10 +1252,12 @@
       ? (g.min === g.max ? g.min : g.min + '–' + g.max) + ' graczy' : '';
     var time = g.maxT
       ? (g.minT && g.minT !== g.maxT ? g.minT + '–' + g.maxT : g.maxT) + ' min' : '';
-    return '<a class="game-card" href="https://boardgamegeek.com/boardgame/' + esc(g.id) + '" target="_blank" rel="noopener">' +
+    var bggType = g.exp ? 'boardgameexpansion' : 'boardgame';
+    return '<a class="game-card" href="https://boardgamegeek.com/' + bggType + '/' + esc(g.id) + '" target="_blank" rel="noopener">' +
       '<div class="game-cover">' +
         (g.thumb ? '<img src="' + esc(g.thumb) + '" alt="' + esc(g.name) + '" loading="lazy">' : '<div class="game-no-cover">♟</div>') +
         diffBadge(g.w) +
+        (g.exp ? '<span class="exp-badge">Dodatek</span>' : '') +
       '</div>' +
       '<div class="game-info">' +
         '<p class="game-title">' + esc(g.name) + '</p>' +
