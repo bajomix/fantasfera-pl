@@ -375,6 +375,10 @@
   }
   .badge-regular { background: rgba(232,168,32,0.15); color: var(--gold-dim); border: 1px solid var(--gold-dim); }
   .badge-special { background: rgba(201,76,12,0.15); color: var(--ember-glow); border: 1px solid var(--ember); }
+  .badge-paused { background: rgba(160,40,30,0.25); color: #ffb4a8; border: 1px solid #a0281e; }
+  .schedule-table tr.is-paused td { opacity: 0.55; }
+  .schedule-table tr.is-paused td:nth-child(2) { opacity: 1; }
+  .schedule-table tr.is-paused .event-name { opacity: 0.55; text-decoration: line-through; text-decoration-color: rgba(255,180,168,0.6); }
   .event-cell {
     display: flex;
     align-items: center;
@@ -979,9 +983,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr class="is-paused">
           <td>Każdy wtorek</td>
-          <td><div class="event-cell"><span class="event-name">Wtorkowe Planszówki w Pubie U7</span><span class="badge badge-regular">Cykliczne</span></div></td>
+          <td><div class="event-cell"><span class="event-name">Wtorkowe Planszówki w Pubie U7</span><span class="badge badge-paused">⏸ Czasowo wstrzymane</span></div></td>
           <td>Gdynia - Pub U7</td>
           <td>Najlepsze planszówki z nauką zasad - zapisy przez FB</td>
         </tr>
