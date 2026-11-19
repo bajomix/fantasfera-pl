@@ -590,6 +590,9 @@
   }
   .page-btn:hover:not(:disabled) { background: rgba(232,168,32,0.2); border-color: var(--gold); }
   .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .games-credit { margin-top: 18px; text-align: center; font-size: 12px; color: var(--text-muted); }
+  .games-credit a { color: var(--gold-dim); text-decoration: none; border-bottom: 1px dotted var(--gold-dim); }
+  .games-credit a:hover { color: var(--gold-light); border-color: var(--gold-light); }
   .page-info { color: var(--text-muted); font-size: 13px; min-width: 60px; text-align: center; }
   @media (max-width: 640px) {
     #games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
@@ -1043,6 +1046,7 @@
       <p class="games-loading">Ładowanie kolekcji…</p>
     </div>
     <div id="games-pagination"></div>
+    <p class="games-credit">Dane o grach: <a href="https://boardgamegeek.com" target="_blank" rel="noopener">BoardGameGeek</a></p>
   </div>
 </section>
 
