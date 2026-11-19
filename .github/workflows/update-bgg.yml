@@ -15,7 +15,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies
         run: pip install cloudscraper requests
@@ -24,6 +24,7 @@ jobs:
         env:
           BGG_USERNAME: ${{ secrets.BGG_USERNAME }}
           BGG_PASSWORD: ${{ secrets.BGG_PASSWORD }}
+          BGG_API_TOKEN: ${{ secrets.BGG_API_TOKEN }}
         run: python3 .github/scripts/fetch_bgg.py
 
       - name: Commit if changed

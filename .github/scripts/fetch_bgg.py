@@ -3,17 +3,29 @@ import cloudscraper, json, time, os, xml.etree.ElementTree as ET
 USERNAME = 'Bajomix'
 BGG_USER = os.environ.get('BGG_USERNAME', '')
 BGG_PASS = os.environ.get('BGG_PASSWORD', '')
+BGG_TOKEN = os.environ.get('BGG_API_TOKEN', '')
 
 scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
 )
 
-if BGG_USER and BGG_PASS:
-    r = scraper.post(
-        'https://boardgamegeek.com/login/api/v1',
-        json={"credentials": {"username": BGG_USER, "password": BGG_PASS}}
-    )
-    print(f"Login: {r.status_code}")
+if BGG_TOKEN:
+    # Since autumn 2025 BGG requires a registered application token for XML API
+    # (https://boardgamegeek.com/applications). This avoids the login flow, which
+    # BGG often blocks (403) from GitHub Actions IPs.
+    scraper.headers['Authorization'] = f'Bearer {BGG_TOKEN}'
+    print("Using BGG_API_TOKEN (Bearer auth).")
+elif BGG_USER and BGG_PASS:
+    print("WARNING: BGG_API_TOKEN not set, falling back to login (unreliable from CI).")
+    for attempt in range(3):
+        r = scraper.post(
+            'https://boardgamegeek.com/login/api/v1',
+            json={"credentials": {"username": BGG_USER, "password": BGG_PASS}}
+        )
+        print(f"Login attempt {attempt+1}: {r.status_code}")
+        if r.status_code in (200, 204):
+            break
+        time.sleep(20)
 
 coll_url = f'https://boardgamegeek.com/xmlapi2/collection?username={USERNAME}&stats=1&own=1'
 text = None

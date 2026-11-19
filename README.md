@@ -85,6 +85,16 @@ Dane kolekcji pobierane są przez GitHub Action (`.github/workflows/update-bgg.y
 
 > **Uwaga:** BGG XML API zwraca 401 dla wszystkich metod z IP datacenter. Wagi (`averageweight`) pobierane są raz lokalnie z eksportu CSV kolekcji BGG i commitowane jako `weights.json`.
 
+### Token API BGG (wymagany)
+
+Od jesieni 2025 BGG wymaga tokena aplikacji do XML API. Bez niego logowanie z GitHub Actions często kończy się 403, a pobranie kolekcji 401.
+
+1. Zarejestruj aplikację na [boardgamegeek.com/applications](https://boardgamegeek.com/applications) i wygeneruj token
+2. GitHub → Settings → Secrets and variables → Actions → dodaj sekret `BGG_API_TOKEN`
+3. Uruchom workflow ręcznie (Actions → Update BGG Collection → Run workflow)
+
+Sekrety `BGG_USERNAME`/`BGG_PASSWORD` służą tylko jako zapasowe logowanie.
+
 ### Aktualizacja wag trudności
 
 1. Wejdź na BGG → Kolekcja → Eksportuj jako CSV
