@@ -98,6 +98,17 @@ if os.path.exists(weights_file):
 else:
     print("weights.json not found — weights will be 0. Run fetch_weights_local.py locally.")
 
+# Expansions without their own BGG weight inherit the weight of their base
+# game, matched by name prefix ("Revenant: Reason and Faith" -> "Revenant").
+bases = sorted((g for g in games if not g.get('exp') and g['w'] > 0), key=lambda g: -len(g['name']))
+for g in games:
+    if g.get('exp') and not g['w']:
+        for b in bases:
+            if g['name'].startswith(b['name']) and g['name'][len(b['name']):][:2] in (': ', ' –', ' -', ' ('):
+                g['w'] = b['w']
+                print(f"Expansion '{g['name']}' inherits weight {b['w']} from '{b['name']}'.")
+                break
+
 with open('bgg-collection.json', 'w', encoding='utf-8') as f:
     json.dump(games, f, ensure_ascii=False)
 

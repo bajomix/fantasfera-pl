@@ -114,6 +114,8 @@ Sekrety `BGG_USERNAME`/`BGG_PASSWORD` służą tylko jako zapasowe logowanie.
 
 ### Progi trudności (badge'y)
 
+Dodatki bez własnej wagi na BGG dziedziczą wagę gry podstawowej z kolekcji (dopasowanie po początku nazwy, np. „Revenant: Reason and Faith” → „Revenant”).
+
 | Badge | Zakres averageweight |
 |---|---|
 | Początkujący | < 2.0 |
