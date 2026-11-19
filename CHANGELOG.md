@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-11-19] — Naprawa kalendarza Google
+
+### Zmiany
+- Widget kalendarza nie działał: wszystkie publiczne CORS proxy odrzucały zapytania z fantasfera.pl (corsproxy.io wymaga klucza API, allorigins/codetabs zwracają 522)
+- Nowy workflow `update-calendar.yml` (co 3 h) + `fetch_calendar.py`: iCal → `calendar.json`, commit tylko przy zmianie
+- Frontend czyta `/calendar.json` same-origin
+- Wtorkowe spotkania w Pubie U7 oznaczone jako „Czasowo wstrzymane”
+- Oba workflowy danych w jednej grupie `concurrency`, żeby nie kolidowały przy pushu
+
+---
+
 ## [2026-11-19] — Badge „Dodatek”, wagi, token BGG
 
 ### Zmiany

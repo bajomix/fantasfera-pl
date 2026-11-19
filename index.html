@@ -1139,49 +1139,13 @@
   var DAYS       = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
   var DAYS_SHORT = ['NDZ','PN','WT','ŚR','CZW','PT','SOB'];
 
-  function unescapeIcal(s) {
-    return s.replace(/\\n/g, ' ').replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\\\/g, '\\');
-  }
-
-  function parseDate(prop, val) {
-    var v = val.trim();
-    try {
-      if (v.length === 8) return new Date(+v.substr(0,4), +v.substr(4,2)-1, +v.substr(6,2));
-      var y=+v.substr(0,4), mo=+v.substr(4,2)-1, d=+v.substr(6,2);
-      var h=+v.substr(9,2), mi=+v.substr(11,2), s=+v.substr(13,2);
-      return v.endsWith('Z') ? new Date(Date.UTC(y,mo,d,h,mi,s)) : new Date(y,mo,d,h,mi,s);
-    } catch(e) { return null; }
-  }
-
-  function parseIcal(text) {
-    var norm = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n[ \t]/g,'');
-    var lines = norm.split('\n');
-    var events = [], evt = null;
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) continue;
-      if (line === 'BEGIN:VEVENT') { evt = {}; continue; }
-      if (line === 'END:VEVENT')   { if (evt) events.push(evt); evt = null; continue; }
-      if (!evt) continue;
-      var ci = line.indexOf(':');
-      if (ci < 0) continue;
-      var prop = line.substring(0, ci), val = line.substring(ci + 1);
-      var name = prop.split(';')[0].toUpperCase();
-      if      (name === 'SUMMARY')     evt.title    = unescapeIcal(val);
-      else if (name === 'LOCATION')    evt.location = unescapeIcal(val);
-      else if (name === 'DTSTART')     evt.start    = parseDate(prop, val);
-      else if (name === 'DTEND')       evt.end      = parseDate(prop, val);
-    }
-    return events;
-  }
-
   function esc(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   function renderEvent(evt) {
     var d = evt.start;
-    var allDay = (d.getHours() === 0 && d.getMinutes() === 0);
+    var allDay = evt.allDay;
     var time = allDay ? '' : ', godz. ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
     var fullDate = DAYS[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + time;
     var location = evt.location ? '<br>📍 ' + esc(evt.location) : '';
@@ -1191,42 +1155,30 @@
       '</div>';
   }
 
-  var ICAL_URL = 'https://calendar.google.com/calendar/ical/2da0751953a6122c8f81e7f4840092cac413ef4c5a4070ff395bcf0c3c450b2e%40group.calendar.google.com/public/basic.ics';
-  var PROXIES = [
-    'https://corsproxy.io/?url=' + encodeURIComponent(ICAL_URL),
-    'https://corsproxy.io/?' + ICAL_URL,
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(ICAL_URL),
-    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(ICAL_URL),
-  ];
-
+  // calendar.json is generated every 3 hours by .github/workflows/update-calendar.yml
+  // from the public Google Calendar iCal feed (same-origin, no CORS proxy).
   var widget = document.getElementById('calendar-widget');
 
-  function tryFetch(proxies) {
-    if (!proxies.length) return Promise.reject(new Error('all proxies failed'));
-    return fetch(proxies[0])
-      .then(function(r) { return r.text(); })
-      .then(function(text) {
-        if (!text || text.indexOf('BEGIN:VCALENDAR') < 0) throw new Error('invalid');
-        return text;
-      })
-      .catch(function() { return tryFetch(proxies.slice(1)); });
+  function toDate(e) {
+    if (e.allDay) {
+      var p = e.start.split('-');
+      return new Date(+p[0], +p[1] - 1, +p[2]);
+    }
+    return new Date(e.start);
   }
 
-  tryFetch(PROXIES)
-    .then(function(text) {
+  fetch('/calendar.json', { cache: 'no-cache' })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
       var now = new Date(); now.setHours(0,0,0,0);
-      var all = parseIcal(text);
-      var events = all
-        .filter(function(e) { return e.start && e.start >= now; })
+      var events = data
+        .map(function(e) { return { title: e.title, location: e.location, allDay: e.allDay, start: toDate(e) }; })
+        .filter(function(e) { return !isNaN(e.start) && e.start >= now; })
         .sort(function(a,b) { return a.start - b.start; })
         .slice(0, 12);
-      if (events.length) {
-        widget.innerHTML = events.map(renderEvent).join('');
-      } else if (all.length > 0) {
-        widget.innerHTML = '<p class="cal-empty">Brak nadchodzących wydarzeń — sprawdź wkrótce!</p>';
-      } else {
-        widget.innerHTML = '<p class="cal-empty">Kalendarz jest pusty.</p>';
-      }
+      widget.innerHTML = events.length
+        ? events.map(renderEvent).join('')
+        : '<p class="cal-empty">Brak nadchodzących wydarzeń — sprawdź wkrótce!</p>';
     })
     .catch(function() {
       widget.innerHTML = '<p class="cal-empty">Nie udało się załadować kalendarza. Spróbuj odświeżyć stronę.</p>';

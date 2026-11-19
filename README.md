@@ -33,9 +33,9 @@ Strona statyczna (HTML + CSS + JS) hostowana na **GitHub Pages**. Zaprojektowana
 
 ## Kalendarz Google
 
-Widget kalendarza pobiera wydarzenia z publicznego kalendarza Google przez iCal (`.ics`) za pomocą CORS proxy. Próbuje kolejno:
-1. `corsproxy.io`
-2. `allorigins.win`
+Widget „Najbliższe wydarzenia” czyta `/calendar.json` (same-origin, bez CORS proxy). Plik generuje GitHub Action `.github/workflows/update-calendar.yml` co 3 godziny: skrypt `fetch_calendar.py` pobiera publiczny kalendarz Google (iCal), zapisuje nadchodzące wydarzenia i commituje tylko przy zmianie. Nowe wydarzenie w kalendarzu pojawia się na stronie najpóźniej po ok. 3 godzinach; szybciej — ręczny trigger workflow w zakładce Actions.
+
+> Wcześniej widget pobierał iCal przez publiczne CORS proxy (corsproxy.io, allorigins, codetabs) — od 2025/2026 przestały działać dla zewnętrznych domen.
 
 Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, miesiąc, rok) i godziną.
 
@@ -47,6 +47,7 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 /
 ├── index.html                      # Strona główna
 ├── bgg-collection.json             # Kolekcja BGG (generowana przez GitHub Action)
+├── calendar.json                   # Nadchodzące wydarzenia z kalendarza Google (GitHub Action)
 ├── CNAME                           # Domena niestandardowa dla GitHub Pages
 ├── Fantasfera_logo.png             # Logo graficzne (kwadrat)
 ├── Logo_bez_deski_transparent.png  # Logo hero (bez tła)
@@ -61,8 +62,10 @@ Wyświetla nadchodzące wydarzenia z pełną datą (dzień tygodnia, numer, mies
 ├── fetch_weights_local.py          # Skrypt: ekstrakcja wag z CSV eksportu BGG
 ├── merge_guest_collection.py       # Skrypt: scalanie kolekcji znajomego z CSV
 ├── .github/
-│   ├── workflows/update-bgg.yml    # GitHub Action: cotygodniowa sync kolekcji BGG
-│   └── scripts/fetch_bgg.py        # Skrypt Python: pobiera kolekcję + merguje wagi
+│   ├── workflows/update-bgg.yml       # GitHub Action: cotygodniowa sync kolekcji BGG
+│   ├── workflows/update-calendar.yml  # GitHub Action: sync kalendarza co 3 h
+│   ├── scripts/fetch_bgg.py           # Skrypt Python: pobiera kolekcję + merguje wagi
+│   └── scripts/fetch_calendar.py      # Skrypt Python: iCal → calendar.json
 ├── README.md
 └── CHANGELOG.md
 ```
