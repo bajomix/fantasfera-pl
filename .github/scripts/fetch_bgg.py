@@ -49,7 +49,7 @@ for item in root.findall('item'):
     stats = item.find('stats')
     games.append({
         'id':    gid,
-        'name':  (name.text or '?').strip() if name is not None else '?',
+        'name':  ' '.join((name.text or '?').split()) if name is not None else '?',
         'thumb': (thumb.text or '').strip() if thumb is not None else '',
         'min':   int(stats.get('minplayers', 0)) if stats is not None else 0,
         'max':   int(stats.get('maxplayers', 0)) if stats is not None else 0,
