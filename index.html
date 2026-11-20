@@ -1279,7 +1279,7 @@
   fetch('/bgg-collection.json', { cache: 'no-cache' })
     .then(function(r) { if (!r.ok) throw new Error('no file'); return r.json(); })
     .then(function(data) {
-      allGames = data.sort(function(a, b) { return a.name.localeCompare(b.name); });
+      allGames = data.sort(function(a, b) { return a.name.localeCompare(b.name, 'pl'); });
       if (!allGames.length) { grid.innerHTML = '<p class="games-empty">Kolekcja jest pusta.</p>'; return; }
       applyFilters();
     })
