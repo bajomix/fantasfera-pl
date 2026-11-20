@@ -35,5 +35,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bgg-collection.json
-          git diff --staged --quiet || (git commit -m "Update BGG collection data [skip ci]" && git push)
+          git add bgg-collection.json weights.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Update BGG collection data [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

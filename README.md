@@ -87,7 +87,7 @@ Dane kolekcji pobierane są przez GitHub Action (`.github/workflows/update-bgg.y
 - Wynik zapisywany jako `bgg-collection.json` i commitowany do repo
 - Frontend czyta `/bgg-collection.json` (same-origin, zero CORS)
 
-> **Uwaga:** BGG XML API zwraca 401 dla wszystkich metod z IP datacenter. Wagi (`averageweight`) pobierane są raz lokalnie z eksportu CSV kolekcji BGG i commitowane jako `weights.json`.
+> Wagi trudności (`averageweight`) pobierane są automatycznie przy każdej synchronizacji z BGG thing API (wymaga `BGG_API_TOKEN`) i zapisywane w `weights.json`. Gra bez wagi na BGG zachowuje wartość z `weights.json` — tam można wpisać wagę ręcznie (np. Dylematy 2 = 1.5).
 
 ### Token API BGG (wymagany)
 
@@ -99,7 +99,9 @@ Od jesieni 2025 BGG wymaga tokena aplikacji do XML API. Bez niego logowanie z Gi
 
 Sekrety `BGG_USERNAME`/`BGG_PASSWORD` służą tylko jako zapasowe logowanie.
 
-### Aktualizacja wag trudności
+### Aktualizacja wag trudności (ręcznie, awaryjnie)
+
+Normalnie niepotrzebne — workflow pobiera wagi sam. Gdyby API nie działało:
 
 1. Wejdź na BGG → Kolekcja → Eksportuj jako CSV
 2. Uruchom: `python3 fetch_weights_local.py collection.csv`

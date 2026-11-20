@@ -85,18 +85,51 @@ for g in games:
         g['exp'] = True
 print(f"Marked {sum(1 for g in games if g.get('exp'))} expansions.")
 
-# Merge weights from weights.json (maintained locally via fetch_weights_local.py)
+# Difficulty weights. weights.json is a cache ({id: weight}) that also holds
+# manual values for games BGG has no weight for yet (e.g. Dylematy 2).
 weights_file = 'weights.json'
+weights = {}
 if os.path.exists(weights_file):
     with open(weights_file, encoding='utf-8') as f:
         weights = json.load(f)
-    merged = sum(1 for g in games if g['id'] in weights)
-    for g in games:
-        if g['id'] in weights:
-            g['w'] = weights[g['id']]
-    print(f"Merged weights for {merged}/{len(games)} games from {weights_file}.")
-else:
-    print("weights.json not found — weights will be 0. Run fetch_weights_local.py locally.")
+
+# With an application token, fetch current averageweight from the thing API
+# (max 20 ids per request). A real BGG value (> 0) overrides the cache.
+if BGG_TOKEN:
+    ids = [g['id'] for g in games]
+    updated = 0
+    for i in range(0, len(ids), 20):
+        batch = ids[i:i + 20]
+        url = f"https://boardgamegeek.com/xmlapi2/thing?id={','.join(batch)}&stats=1"
+        for attempt in range(4):
+            r = scraper.get(url)
+            if r.status_code == 200 and '<items' in r.text:
+                break
+            print(f"Thing batch {i // 20 + 1} attempt {attempt+1}: HTTP {r.status_code}")
+            time.sleep(10)
+        else:
+            print(f"Thing batch {i // 20 + 1} failed, keeping cached weights.")
+            continue
+        for item in ET.fromstring(r.text).findall('item'):
+            aw = item.find('statistics/ratings/averageweight')
+            try:
+                w = round(float(aw.get('value')), 3) if aw is not None else 0.0
+            except (TypeError, ValueError):
+                w = 0.0
+            if w > 0 and weights.get(item.get('id')) != w:
+                weights[item.get('id')] = w
+                updated += 1
+        time.sleep(3)  # be gentle with the API
+    print(f"Fetched weights from BGG, {updated} changed.")
+    with open(weights_file, 'w', encoding='utf-8') as f:
+        json.dump(weights, f, ensure_ascii=False, indent=2, sort_keys=True)
+
+merged = 0
+for g in games:
+    if g['id'] in weights:
+        g['w'] = weights[g['id']]
+        merged += 1
+print(f"Weights for {merged}/{len(games)} games.")
 
 # Expansions without their own BGG weight inherit the weight of their base
 # game, matched by name prefix ("Revenant: Reason and Faith" -> "Revenant").
